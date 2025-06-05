@@ -8,6 +8,7 @@
     --bg-color: #ffffff;
     --light-bg: #f5f7fa;
     --border-color: #e1e4e8;
+    --transition-speed: 0.3s;
 }
 
 * {
@@ -17,10 +18,11 @@
 }
 
 body {
-    font-family: 'Noto Sans JP', sans-serif;
-    color: var(--text-color);
+    font-family: 'Poppins', 'Noto Sans JP', sans-serif;
     line-height: 1.6;
-    background-color: var(--bg-color);
+    color: #333;
+    overflow-x: hidden;
+    background-color: var(--light-color);
 }
 
 .container {
@@ -95,12 +97,15 @@ nav ul li a:hover {
 /* セクション共通 */
 .section {
     padding: 80px 0;
+    position: relative;
+    overflow: hidden;
 }
 
 .section-title {
     text-align: center;
+    margin-bottom: 40px;
     font-size: 32px;
-    margin-bottom: 50px;
+    color: var(--secondary-color);
     position: relative;
 }
 

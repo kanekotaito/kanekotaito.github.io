@@ -13,23 +13,40 @@
     <meta property="og:title" content="クリエイティブポートフォリオ | Web制作・デザイン">
     <meta property="og:description" content="Web制作とデザインのポートフォリオサイトです。洗練されたUI/UXデザインと効果的なコーディングで、あなたのビジョンを実現します。">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ユーザー名.github.io/">
-    <meta property="og:image" content="https://ユーザー名.github.io/images/ogp.jpg">
+    <meta property="og:url" content="https://kanekotaito.github.io/">
+    <meta property="og:image" content="https://kanekotaito.github.io/images/ogp.svg">
     <meta property="og:site_name" content="クリエイティブポートフォリオ">
     
     <!-- スタイルシート読み込み -->
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/animations.css">
     
     <!-- Google Fontsの読み込み（Noto Sans JPは日本語ゴシック体） -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- ローディングアニメーション -->
+    <div class="loader">
+        <div class="loader-content">
+            <div class="loader-circle"></div>
+            <div class="loader-text">Loading...</div>
+        </div>
+    </div>
+
     <!-- ヘッダー -->
     <header>
         <div class="container">
-            <h1>クリエイティブポートフォリオ</h1>
+            <h1 class="logo">Creative<span>Portfolio</span></h1>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <nav>
                 <ul>
                     <li><a href="#about">自己紹介</a></li>
@@ -43,75 +60,226 @@
 
     <!-- メインビジュアル -->
     <section class="hero">
+        <div class="hero-bg" style="background-image: url('images/hero/hero-bg.svg');"></div>
         <div class="container">
-            <h2>Web制作 & UIデザイン</h2>
-            <p>あなたのビジョンを魅力的なWebサイトに</p>
+            <div class="hero-content">
+                <h2 class="fade-in">Web制作 & UIデザイン</h2>
+                <p class="fade-in delay-1">あなたのビジョンを<br>魅力的なWebサイトに</p>
+                <div class="hero-buttons fade-in delay-2">
+                    <a href="#works" class="btn btn-primary">作品を見る</a>
+                    <a href="#contact" class="btn btn-outline">お問い合わせ</a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <i class="fas fa-chevron-down"></i>
         </div>
     </section>
 
     <!-- 自己紹介セクション -->
     <section id="about" class="section">
         <div class="container">
-            <h2 class="section-title">自己紹介</h2>
+            <h2 class="section-title fade-in">自己紹介</h2>
             <div class="profile">
-                <div class="profile-image">
-                    <img src="images/placeholder.jpg" alt="プロフィール写真">
+                <div class="profile-image fade-in">
+                    <img src="images/profile/profile.svg" alt="プロフィール写真">
+                    <div class="profile-shape"></div>
                 </div>
                 <div class="profile-content">
-                    <p>はじめまして、クリエイティブポートフォリオへようこそ。Webデザインと開発に情熱を持って取り組んでいます。</p>
-                    <p>モダンなWebテクノロジーとデザイン理論を組み合わせ、ユーザー体験を最優先に考えたWebサイト制作を行っています。レスポンシブデザイン、アクセシビリティ、パフォーマンス最適化に特にこだわりを持っています。</p>
+                    <h3 class="fade-in">はじめまして、<span>クリエイティブポートフォリオ</span>へようこそ</h3>
+                    <p class="fade-in delay-1">Webデザインと開発に情熱を持って取り組んでいます。モダンなWebテクノロジーとデザイン理論を組み合わせ、ユーザー体験を最優先に考えたWebサイト制作を行っています。</p>
+                    <p class="fade-in delay-2">レスポンシブデザイン、アクセシビリティ、パフォーマンス最適化に特にこだわりを持っています。クライアントのビジョンを理解し、それを実現するための最適なソリューションを提供することを心がけています。</p>
+                    <div class="about-stats fade-in delay-3">
+                        <div class="stat-item">
+                            <span class="stat-number">3</span>
+                            <span class="stat-text">年の経験</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">25</span>
+                            <span class="stat-text">完了プロジェクト</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">15</span>
+                            <span class="stat-text">クライアント</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- スキルセクション -->
-    <section id="skills" class="section bg-light">
+    <section id="skills" class="section bg-gradient">
         <div class="container">
-            <h2 class="section-title">スキル</h2>
+            <h2 class="section-title light-text fade-in">スキル</h2>
             <div class="skills-container">
-                <div class="skill-item">
-                    <h3>HTML/CSS</h3>
-                    <div class="skill-level">
-                        <div class="skill-bar" style="width: 90%"></div>
+                <div class="skill-category fade-in">
+                    <h3>フロントエンド</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>HTML/CSS</h4>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>JavaScript</h4>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>React</h4>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="80%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="skill-item">
-                    <h3>JavaScript</h3>
-                    <div class="skill-level">
-                        <div class="skill-bar" style="width: 80%"></div>
-                    </div>
-                </div>
-                <div class="skill-item">
+                
+                <div class="skill-category fade-in delay-1">
                     <h3>デザイン</h3>
-                    <div class="skill-level">
-                        <div class="skill-bar" style="width: 85%"></div>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>UI/UXデザイン</h4>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>Figma</h4>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>アニメーション</h4>
+                                <span>75%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skill-category fade-in delay-2">
+                    <h3>その他</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>Git</h4>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="80%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>レスポンシブデザイン</h4>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <h4>パフォーマンス最適化</h4>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-level">
+                                <div class="skill-bar" data-width="85%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
         </div>
     </section>
 
     <!-- 作品セクション -->
     <section id="works" class="section">
         <div class="container">
-            <h2 class="section-title">作品</h2>
+            <h2 class="section-title fade-in">作品</h2>
             <div class="works-grid">
-                <div class="work-item">
-                    <img src="images/placeholder.jpg" alt="作品1">
-                    <h3>作品タイトル1</h3>
-                    <p>作品の説明文をここに記載します。使用した技術やコンセプトについて簡潔に説明しましょう。</p>
+                <div class="work-item fade-in">
+                    <div class="work-image">
+                        <img src="images/works/work1.svg" alt="作品例1">
+                        <div class="work-overlay">
+                            <a href="#" class="work-link"><i class="fas fa-link"></i></a>
+                        </div>
+                    </div>
+                    <div class="work-content">
+                        <h3>コープレートサイト制作</h3>
+                        <p>柔軟なデザインと使いやすさを重視した企業サイト。レスポンシブ対応、SEO対策も完備。</p>
+                        <div class="work-tags">
+                            <span>HTML/CSS</span>
+                            <span>JavaScript</span>
+                            <span>WordPress</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="work-item">
-                    <img src="images/placeholder.jpg" alt="作品2">
-                    <h3>作品タイトル2</h3>
-                    <p>作品の説明文をここに記載します。使用した技術やコンセプトについて簡潔に説明しましょう。</p>
+                <div class="work-item fade-in delay-1">
+                    <div class="work-image">
+                        <img src="images/works/work2.svg" alt="作品例2">
+                        <div class="work-overlay">
+                            <a href="#" class="work-link"><i class="fas fa-link"></i></a>
+                        </div>
+                    </div>
+                    <div class="work-content">
+                        <h3>アプリランディングページ</h3>
+                        <p>モバイルアプリのユーザー獨自の高いコンバージョン率を実現したランディングページ。</p>
+                        <div class="work-tags">
+                            <span>React</span>
+                            <span>GSAP</span>
+                            <span>Firebase</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="work-item">
-                    <img src="images/placeholder.jpg" alt="作品3">
-                    <h3>作品タイトル3</h3>
-                    <p>作品の説明文をここに記載します。使用した技術やコンセプトについて簡潔に説明しましょう。</p>
+                <div class="work-item fade-in delay-2">
+                    <div class="work-image">
+                        <img src="images/works/work3.svg" alt="作品例3">
+                        <div class="work-overlay">
+                            <a href="#" class="work-link"><i class="fas fa-link"></i></a>
+                        </div>
+                    </div>
+                    <div class="work-content">
+                        <h3>ポートフォリオサイト</h3>
+                        <p>モダンなアニメーションとインタラクティブ要素を取り入れたポートフォリオサイト。</p>
+                        <div class="work-tags">
+                            <span>HTML/CSS</span>
+                            <span>JavaScript</span>
+                            <span>Intersection Observer</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="center-btn fade-in delay-3">
+                <a href="#" class="btn btn-outline">すべての作品を見る</a>
             </div>
         </div>
     </section>
@@ -119,17 +287,39 @@
     <!-- お問い合わせセクション -->
     <section id="contact" class="section bg-light">
         <div class="container">
-            <h2 class="section-title">お問い合わせ</h2>
-            <p class="contact-text">お仕事のご依頼やご質問などがありましたら、以下の方法でお気軽にご連絡ください。</p>
+            <h2 class="section-title fade-in">お問い合わせ</h2>
+            <p class="contact-text fade-in">お仕事のご依頼やご質問などがありましたら、以下の方法でお気軽にご連絡ください。</p>
             <div class="contact-info">
-                <div class="contact-item">
-                    <h3>メール</h3>
-                    <p>example@example.com</p>
+                <div class="contact-item fade-in">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h3>メール</h3>
+                        <p>example@example.com</p>
+                    </div>
                 </div>
-                <div class="contact-item">
-                    <h3>SNS</h3>
-                    <p>Twitter: @yourname</p>
-                    <p>GitHub: yourusername</p>
+                <div class="contact-item fade-in delay-1">
+                    <div class="contact-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h3>SNS</h3>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-item fade-in delay-2">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h3>所在地</h3>
+                        <p>東京都渋谷区</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,8 +328,37 @@
     <!-- フッター -->
     <footer>
         <div class="container">
-            <p>&copy; 2025 クリエイティブポートフォリオ All Rights Reserved.</p>
+            <div class="footer-content">
+                <div class="footer-logo fade-in">
+                    <h3>Creative<span>Portfolio</span></h3>
+                    <p>モダンでクリエイティブなウェブ制作をお届けします。</p>
+                </div>
+                <div class="footer-links fade-in">
+                    <h4>リンク</h4>
+                    <ul>
+                        <li><a href="#about">自己紹介</a></li>
+                        <li><a href="#skills">スキル</a></li>
+                        <li><a href="#works">作品</a></li>
+                        <li><a href="#contact">お問い合わせ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social fade-in">
+                    <h4>ソーシャル</h4>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Creative Portfolio. All Rights Reserved.</p>
+            </div>
         </div>
     </footer>
+
+    <!-- JavaScriptの読み込み -->
+    <script src="js/main.js"></script>
 </body>
 </html>
