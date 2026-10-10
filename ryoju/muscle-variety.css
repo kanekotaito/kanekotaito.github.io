@@ -1,0 +1,101 @@
+/* MUSCLE FX COLLECTION v8: unique animations unlock through real mastery */
+.mqv-collection{margin:13px 0 16px;padding:16px;border-radius:18px;border:1px solid #d7c0ec;background:linear-gradient(112deg,#fff9e8,#f6edff 55%,#e8fff8);box-shadow:0 6px 22px #9c72b719}
+.mqv-collection-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mqv-collection-title span{font-size:9px;letter-spacing:.17em;color:#8c6aad;font-weight:900}
+.mqv-collection-title h3{font-size:17px;color:#51407e;margin:4px 0 0}
+.mqv-collection-title>b{font-size:12px;color:#815ac3;white-space:nowrap;background:#fff;border:1px solid #e0d1ef;border-radius:999px;padding:7px 10px}
+.mqv-collection-icons{display:flex;gap:6px;flex-wrap:wrap;margin:13px 0}
+.mqv-collection-icons>span{display:grid;place-items:center;width:31px;height:31px;border-radius:9px;background:#ffffffbb;border:1px solid #e5d5eb;font-size:18px}
+.mqv-collection-icons .mqv-missing{color:#a79ab4!important;background:#eee7ed;font-size:22px}
+.mqv-collection p{font-size:12px;color:#74539a;margin:0 0 7px}
+.mqv-collection small{font-size:10px;color:#8a7c93;line-height:1.65}
+.mqv-splash{position:absolute;inset:0;overflow:hidden;pointer-events:none;isolation:isolate;display:flex;align-items:center;justify-content:center;--mqv-a:#4ee6c3;--mqv-b:#2071bb;--mqv-c:#ffdf7b;--mqv-text:#fff5ca;background:radial-gradient(ellipse at 50% 41%,#a5ffe3 0%,#239b9a 39%,#133357 75%,#0b1430 100%);animation:mqvSceneExit 2.95s ease-out forwards}
+.mqv-splash:before{content:"";position:absolute;inset:-30%;background:repeating-conic-gradient(from 0deg,#ffffff4c 0 8deg,transparent 8deg 18deg);opacity:.53;animation:mqvSpin 8s linear infinite;mix-blend-mode:screen}
+.mqv-splash:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 38%,#ffffff4d,transparent 55%);animation:mqvBloom 1.5s ease-out both;pointer-events:none}
+.mqv-world{position:absolute;inset:0;pointer-events:none}
+.mqv-beams{position:absolute;inset:-22%;background:repeating-conic-gradient(from 0deg,transparent 0 13deg,#ffffff72 13deg 17deg,transparent 17deg 30deg);opacity:.4;animation:mqvSpin 6.5s linear infinite}
+.mqv-pulse-ring{position:absolute;left:50%;top:51%;width:33vmin;height:33vmin;border-radius:50%;border:10px solid var(--mqv-c);box-shadow:0 0 22px var(--mqv-c),0 0 70px 15px var(--mqv-a);transform:translate(-50%,-50%);animation:mqvRing 1.65s cubic-bezier(.15,.74,.34,1) infinite}
+.mqv-emblem{position:absolute;font-size:clamp(68px,16vw,137px);filter:drop-shadow(0 0 19px var(--mqv-c));opacity:.68;animation:mqvOrbit 2.1s ease-in-out infinite alternate}
+.mqv-emblem-a{left:2%;top:16%;transform:rotate(-14deg)}.mqv-emblem-b{right:3%;bottom:22%;animation-delay:.45s;transform:rotate(12deg)}
+.mqv-stage-content{position:relative;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:space-around;width:min(100vw,620px);height:min(100%,950px);padding:max(23px,env(safe-area-inset-top)) 6px max(20px,env(safe-area-inset-bottom));text-align:center}
+.mqv-label{font-size:clamp(9px,2.7vw,12px);font-weight:950;letter-spacing:.2em;color:var(--mqv-c);background:#0f1b3bb0;padding:7px 13px;border:1px solid #ffffff5c;border-radius:99px;backdrop-filter:blur(3px)}
+.mqv-headline{font-weight:1000;line-height:1.07;font-size:clamp(35px,9.7vw,66px);letter-spacing:-.04em;color:#fff;text-shadow:0 3px 0 var(--mqv-b),0 7px 0 #342e76,0 13px 25px #09143bbd;paint-order:stroke fill;-webkit-text-stroke:1px var(--mqv-c);animation:mqvHeadline .58s cubic-bezier(.14,1.2,.3,1) both}
+.mqv-caption{display:inline-block;max-width:92%;font-size:clamp(13px,4vw,20px);font-weight:950;line-height:1.25;background:linear-gradient(92deg,var(--mqv-c),#fff,var(--mqv-a));color:#303251;box-shadow:0 7px 21px #1a1b4c9c;padding:8px 16px;border-radius:30px;animation:mqvPop .68s ease-out both;animation-delay:.1s}
+.mqv-hero{width:min(95vw,450px);height:min(57vh,530px);filter:drop-shadow(0 0 20px var(--mqv-c)) drop-shadow(0 12px 11px #18213eae);animation:mqvHeroEnter .7s cubic-bezier(.13,1.1,.35,1) both}
+.mqv-hero .muscle-svg{width:100%;height:100%;max-height:100%;filter:none}
+.mqv-footer{display:flex;flex-direction:column;align-items:center;gap:4px;max-width:95%;border-radius:18px;background:#0c1d3fba;border:1px solid #ffffff78;padding:10px 18px;color:var(--mqv-text);box-shadow:0 6px 23px #15204380}
+.mqv-footer strong{font-size:clamp(14px,4vw,19px);font-weight:1000;letter-spacing:.09em}
+.mqv-footer span{font-size:11px;color:#f2ffeb;font-weight:800}
+.mqv-piece{position:absolute;z-index:3;left:var(--x);top:var(--y);width:var(--sz);height:calc(var(--sz) * 1.6);background:var(--hue);box-shadow:0 0 11px var(--hue);opacity:0;animation:mqvBurst var(--duration) ease-out var(--delay) forwards;border-radius:2px;font-style:normal}
+.mqv-star,.mqv-bolt,.mqv-petal{background:none;box-shadow:none;line-height:1;font-size:calc(var(--sz) * 1.5);text-shadow:0 0 12px var(--hue)}
+.mqv-line{width:calc(var(--sz) / 2);height:calc(var(--sz) * 6);border-radius:99px;filter:blur(.2px)}
+.mqv-circle{border-radius:100%}
+.mqv-splash.mqv-big .mqv-headline{font-size:clamp(40px,11.4vw,74px);animation:mqvHeadline .48s cubic-bezier(.14,1.24,.3,1) both}
+.mqv-splash.mqv-big .mqv-hero{filter:drop-shadow(0 0 35px var(--mqv-c)) drop-shadow(0 0 16px var(--mqv-a))}
+.mqv-splash.mqv-first-unlock .mqv-caption{background:linear-gradient(90deg,#ffe86d,#ff85ee,#c1fbff);box-shadow:0 0 30px #fff1a5}
+/* Effect-specific palette, lighting, silhouettes and movement */
+.mqv-theme-pulse{--mqv-a:#7bffe5;--mqv-b:#1683d1;--mqv-c:#ffea92;background:radial-gradient(circle at 50% 46%,#7ffbe4,#1686ad 36%,#123c72 66%,#090e39)}
+.mqv-theme-festival{--mqv-a:#ff82c7;--mqv-b:#8848d2;--mqv-c:#ffe67d;background:radial-gradient(ellipse at 50% 45%,#ffeb95,#fa65aa 37%,#8744bc 69%,#201053)}
+.mqv-theme-festival .mqv-pulse-ring{border-style:dashed}.mqv-theme-festival .mqv-beams{animation-duration:3.5s}
+.mqv-theme-thunder{--mqv-a:#b8b3ff;--mqv-b:#754deb;--mqv-c:#f7e969;background:repeating-linear-gradient(135deg,transparent 0 100px,#ffffff13 101px 105px),radial-gradient(circle at 50% 48%,#dbcdff,#684ce2 42%,#24135d 78%,#060e31)}
+.mqv-theme-thunder .mqv-pulse-ring{border-style:dotted;animation-duration:1s}
+.mqv-theme-comet{--mqv-a:#88f9fa;--mqv-b:#4165bd;--mqv-c:#ffe9a9;background:radial-gradient(ellipse at 36% 35%,#e9ffb8,#528ac7 36%,#24225c 65%,#090723)}
+.mqv-theme-comet .mqv-beams{animation-direction:reverse;animation-duration:2.6s}
+.mqv-theme-volcano{--mqv-a:#ffb14b;--mqv-b:#c92b55;--mqv-c:#fff198;background:radial-gradient(ellipse at 50% 70%,#ffe070,#fa5f31 35%,#962a3f 61%,#220c2f)}
+.mqv-theme-volcano .mqv-hero{animation:mqvHeroShake .65s ease-in-out infinite alternate}
+.mqv-theme-neon{--mqv-a:#60fff1;--mqv-b:#f84add;--mqv-c:#f5fc77;background:repeating-linear-gradient(90deg,#16def91b 0 11px,transparent 12px 45px),radial-gradient(ellipse at 50% 30%,#f778ff,#6533bd 50%,#081a39)}
+.mqv-theme-neon .mqv-beams{animation-direction:reverse;animation-duration:1.9s}
+.mqv-theme-ocean{--mqv-a:#9cffee;--mqv-b:#188eb8;--mqv-c:#e2ffa4;background:radial-gradient(ellipse at 50% 36%,#acfef5,#329acc 40%,#195d95 67%,#073453)}
+.mqv-theme-ocean .mqv-pulse-ring{border-radius:35%;animation-duration:2s}
+.mqv-theme-blossom{--mqv-a:#ffc5ea;--mqv-b:#cd679b;--mqv-c:#fff1bc;background:radial-gradient(circle at 50% 36%,#fff5d7,#fbb9d2 39%,#aa5aa6 70%,#4e2b79)}
+.mqv-theme-blossom .mqv-beams{opacity:.12}.mqv-theme-blossom .mqv-pulse-ring{border-style:dotted}
+.mqv-theme-glacier{--mqv-a:#b1fdff;--mqv-b:#4681d9;--mqv-c:#f8ffff;background:repeating-linear-gradient(100deg,#ffffff18 0 4px,transparent 4px 40px),radial-gradient(circle at 50% 48%,#e4ffff,#6ac9e5 35%,#255ab0 72%,#10164c)}
+.mqv-theme-laser{--mqv-a:#a6ff8d;--mqv-b:#0c8a79;--mqv-c:#efff66;background:repeating-linear-gradient(152deg,#b5ff6a28 0 3px,transparent 4px 33px),radial-gradient(circle at 50% 48%,#baff63,#23b48d 35%,#175a67 66%,#081d39)}
+.mqv-theme-laser .mqv-beams{animation-duration:1.5s;opacity:.65}
+.mqv-theme-gold{--mqv-a:#fff194;--mqv-b:#c77a19;--mqv-c:#ffffff;background:radial-gradient(circle at 50% 38%,#fffef0,#f8cb47 39%,#b15c35 65%,#552044)}
+.mqv-theme-gold .mqv-pulse-ring{border-width:18px}
+.mqv-theme-galaxy{--mqv-a:#cc87ff;--mqv-b:#594de4;--mqv-c:#7ffff8;background:radial-gradient(circle at 22% 14%,#fff 0 2px,transparent 3px),radial-gradient(circle at 80% 30%,#fff 0 1px,transparent 2px),radial-gradient(ellipse at 50% 42%,#e689ef,#7945b7 36%,#303174 64%,#060f35)}
+.mqv-theme-galaxy .mqv-beams{animation-duration:12s}
+.mqv-theme-supernova{--mqv-a:#ff77eb;--mqv-b:#a840d4;--mqv-c:#fffad0;background:radial-gradient(circle at 50% 44%,#fff 0%,#ffe28e 10%,#f779b7 34%,#814eb4 67%,#110b50)}
+.mqv-theme-supernova .mqv-pulse-ring{animation-duration:.9s;border-width:17px}
+.mqv-theme-celestial{--mqv-a:#a9ffff;--mqv-b:#a166ff;--mqv-c:#fff28e;background:conic-gradient(from 160deg at 50% 50%,#312468,#fdb568,#eb64d5,#4bc3ca,#5d4de3,#312468)}
+.mqv-theme-celestial .mqv-beams{opacity:.85;animation-duration:2s}
+.mqv-theme-treasure{--mqv-a:#fff293;--mqv-b:#b7771d;--mqv-c:#ffd89a;background:radial-gradient(circle at 50% 43%,#fff8c5,#e5a44b 41%,#8444a1 75%,#301b64)}
+.mqv-theme-champion{--mqv-a:#ffdc80;--mqv-b:#7a4bd2;--mqv-c:#fff;background:radial-gradient(circle at 50% 41%,#fcfacf,#cc73c6 44%,#6338a7 72%,#19134f)}
+/* All pose actions animate separate left/right arms and torso; every theme may vary. */
+.mqv-avatar.pose-power{--armL:-25deg;--armR:23deg;--torso:1.09}
+.mqv-avatar.pose-victory{--armL:-43deg;--armR:-43deg;--torso:1.04}
+.mqv-avatar.pose-double{--armL:-23deg;--armR:23deg;--torso:1.13}
+.mqv-avatar.pose-side{--armL:27deg;--armR:-22deg;--torso:1.02}
+.mqv-avatar.pose-crab{--armL:-35deg;--armR:35deg;--torso:1.17}
+.mqv-avatar.pose-disco{--armL:-9deg;--armR:-57deg;--torso:1.06}
+.mqv-avatar.pose-salute{--armL:35deg;--armR:-54deg;--torso:1.04}
+.mqv-avatar.pose-crown{--armL:-55deg;--armR:-55deg;--torso:1.19}
+.mqv-hero .muscle-svg .muscle-arm-left .muscle-arm-inner{animation:mqvArmLeft .47s ease-in-out 5 alternate both}
+.mqv-hero .muscle-svg .muscle-arm-right .muscle-arm-inner{animation:mqvArmRight .47s ease-in-out 5 alternate both}
+.mqv-hero .muscle-svg .muscle-torso{animation:mqvTorso .52s ease-in-out 4 alternate both}
+.mqv-hero .muscle-svg .muscle-face{animation:mqvHead .5s ease-in-out 4 alternate both}
+@keyframes mqvArmLeft{from{transform:rotate(5deg) scale(.96)}to{transform:rotate(var(--armL,-15deg)) scale(1.11)}}
+@keyframes mqvArmRight{from{transform:rotate(-5deg) scale(.96)}to{transform:rotate(var(--armR,15deg)) scale(1.11)}}
+@keyframes mqvTorso{from{transform:scale(.94) translateY(6px)}to{transform:scale(var(--torso,1.05)) translateY(-5px)}}
+@keyframes mqvHead{from{transform:translateY(3px)}to{transform:translateY(-4px) rotate(3deg)}}
+@keyframes mqvSpin{to{transform:rotate(360deg)}}
+@keyframes mqvSceneExit{0%{opacity:0}9%{opacity:1}77%{opacity:1}100%{opacity:0}}
+@keyframes mqvBloom{0%{opacity:0;transform:scale(.7)}24%{opacity:1}100%{opacity:0;transform:scale(1.5)}}
+@keyframes mqvRing{0%{opacity:.2;scale:.3}30%{opacity:1}100%{opacity:0;scale:2.5}}
+@keyframes mqvOrbit{from{translate:0 -14px;opacity:.4}to{translate:0 18px;opacity:.92}}
+@keyframes mqvHeadline{0%{opacity:0;transform:translateY(30px) rotate(-7deg) scale(.45)}64%{opacity:1;transform:translateY(-5px) rotate(3deg) scale(1.14)}100%{transform:translateY(0) rotate(0) scale(1)}}
+@keyframes mqvPop{0%{opacity:0;transform:scale(.4)}80%{opacity:1;transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes mqvHeroEnter{0%{opacity:0;transform:scale(.42) translateY(45px)}48%{opacity:1;transform:scale(1.15) translateY(-12px)}100%{transform:scale(1) translateY(0)}}
+@keyframes mqvHeroShake{from{transform:translateX(-3px) rotate(-1deg)}to{transform:translateX(3px) rotate(1deg)}}
+@keyframes mqvBurst{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}12%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.85) rotate(var(--rotate))}}
+@media(max-width:600px){
+.mqv-stage-content{justify-content:space-evenly;padding:max(17px,env(safe-area-inset-top)) 3px max(17px,env(safe-area-inset-bottom));}
+.mqv-label{font-size:9px;padding:6px 10px}
+.mqv-headline{font-size:clamp(32px,9vw,46px)}.mqv-caption{font-size:clamp(12px,3.5vw,16px);padding:7px 13px}
+.mqv-hero{width:min(94vw,420px);height:min(57vh,460px)}
+.mqv-emblem{font-size:clamp(57px,18vw,90px)}
+.mqv-footer{padding:8px 14px}.mqv-footer strong{font-size:12px}.mqv-footer span{font-size:10px}
+.mqv-splash.mqv-big .mqv-headline{font-size:clamp(37px,10vw,54px)}
+}
+@media(prefers-reduced-motion:reduce){.mqv-splash{display:none!important}.mqv-collection-icons *{animation:none!important}}
