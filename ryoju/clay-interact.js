@@ -9,6 +9,13 @@ if(!window.Muscle||!window.CLAY_TURNTABLE||!window.CLAY_ACTIONS)return;
 var M=window.Muscle;
 var oldHome=M.home,oldCompact=M.compact,oldCelebrate=M.celebrate;
 var FACE_COUNT=12,PHYSIQUE_COUNT=6,POSE_COUNT=8;
+(function installTextureStyles(){
+ if(document.getElementById("clay-textures"))return;
+ var style=document.createElement("style");
+ style.id="clay-textures";
+ style.textContent='.clay-puppet-image{background-image:url("'+window.CLAY_TURNTABLE+'");background-size:1200% 600%}.clay-puppet-image.clay-action{background-image:url("'+window.CLAY_ACTIONS+'");background-size:800% 600%}';
+ document.head.appendChild(style);
+})();
 var posTurn=function(i,row){return (100*i/(FACE_COUNT-1)).toFixed(4)+"% "+(100*row/(PHYSIQUE_COUNT-1)).toFixed(4)+"%";};
 var posAction=function(i,row){return (100*i/(POSE_COUNT-1)).toFixed(4)+"% "+(100*row/(PHYSIQUE_COUNT-1)).toFixed(4)+"%";};
 function rowFor(stage){return Math.max(0,Math.min(5,Math.floor((Math.max(0,Math.min(14,stage))*5+1)/14)));}
@@ -28,7 +35,7 @@ function substitute(html,figure){
 M.avatarSvg=function(stage,pose,mode){return puppet(stage,mode==="mqv-avatar"?"hero":"stage",false);};
 M.home=function(db){
  var s=M.stats(db),html=substitute(oldHome(db),puppet(s.stage,"main",true));
- html=html.replace('<div class="muscle-home-footer">','<div class="clay-instructions"><b>👆 左右にスワイプで360°回転</b><span>なでる・タップで人形がリアクション！</span><small>正解して筋肉を育てよう。なでる操作ではコインは増えません。</small></div><div class="muscle-home-footer">');
+ html=html.replace('<div class="muscle-home-footer">','<div class="clay-instructions"><b>👆 左右にスワイプで360°回転</b><span>なでる・タップで人形がリアクション！</span><small>正解して筋肉を育てよう。なでる操作ではコインは増えません。</small></div><div class="clay-controls"><button type="button" data-clay-btn="left" aria-label="人形を左へ回す">↶ 左に回す</button><button type="button" data-clay-btn="pet" aria-label="人形をなでる">🫳 なでなで</button><button type="button" data-clay-btn="right" aria-label="人形を右へ回す">右に回す ↷</button></div><div class="muscle-home-footer">');
  return html;
 };
 M.compact=function(db){return substitute(oldCompact(db),puppet(M.stats(db).stage,"mini",false));};
@@ -131,6 +138,16 @@ function bind(){
  document.addEventListener("pointerup",finish);
  document.addEventListener("pointercancel",function(){drag=null;});
  document.addEventListener("keydown",keys);
+ document.addEventListener("click",function(e){
+  var button=e.target&&typeof e.target.closest==="function"?e.target.closest("[data-clay-btn]"):null;
+  if(!button)return;
+  var container=button.closest(".muscle-home"),figure=container&&container.querySelector('.clay-puppet[data-interactive="1"]');
+  if(!figure)return;
+  var action=button.getAttribute("data-clay-btn"),angle=Number(figure.getAttribute("data-clay-angle"))||0;
+  if(action==="left")setTurn(figure,angle-1);
+  else if(action==="right")setTurn(figure,angle+1);
+  else if(action==="pet")pet(figure);
+ });
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind);else bind();
 M.celebrate=function(db,opt){
