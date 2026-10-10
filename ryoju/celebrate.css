@@ -1,0 +1,24 @@
+/* Celebration effects, iPhone Safari compatible. v5 */
+#fx-layer{position:fixed;inset:0;z-index:300;overflow:hidden;pointer-events:none;contain:layout style}
+.fx-flash{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#fff59e91,#ed7dbb3d 35%,transparent 72%);animation:fxFlash 1.1s ease-out forwards}
+.fx-toast{position:absolute;top:clamp(115px,25vh,250px);left:50%;width:min(94vw,490px);transform:translateX(-50%);text-align:center;animation:fxToast 1.65s cubic-bezier(.17,1.13,.3,1) forwards;filter:drop-shadow(0 7px 15px #572b6a75)}
+.fx-toast strong{display:block;font-size:clamp(32px,8.5vw,57px);color:#fff2a0;font-weight:1000;letter-spacing:-.04em;line-height:1.18;-webkit-text-stroke:.8px #b66c22;text-shadow:0 4px #bc5c7e,0 8px #3b347a}
+.fx-toast small{display:inline-block;margin-top:12px;padding:7px 16px;border-radius:999px;background:linear-gradient(95deg,#ffe16d,#ffeef9,#bbffee);color:#614052;font-size:clamp(13px,3.8vw,19px);font-weight:950;box-shadow:0 7px 22px #84477266}
+.fx-bit{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);border-radius:var(--r);background:var(--c);animation:fxFly var(--t) cubic-bezier(.11,.68,.27,1) forwards;will-change:transform,opacity}
+.fx-bit.star{background:none;font-size:var(--w);line-height:1}
+@keyframes fxFlash{0%{opacity:0;transform:scale(.8)}15%{opacity:1}100%{opacity:0;transform:scale(1.35)}}
+@keyframes fxToast{0%{opacity:0;transform:translate(-50%,40px) scale(.38) rotate(-6deg)}18%{opacity:1;transform:translate(-50%,0) scale(1.13) rotate(2deg)}35%{transform:translate(-50%,0) scale(1) rotate(0)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-48px) scale(1.08)}}
+@keyframes fxFly{0%{opacity:1;transform:translate(0,0) rotate(0) scale(.6)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.75)}}
+.fx-hud{margin:-1px 0 14px;padding:13px 15px;background:linear-gradient(110deg,#fff9dd,#fff,#e6fcf2);border:1px solid #edcd7f;border-radius:16px;box-shadow:0 5px 18px #d8ba6e26}
+.fx-hud.hot{background:linear-gradient(100deg,#fff1bf,#ffe7ef,#e3f9ff);border-color:#e7aa63}
+.fx-hud.wow{border:2px solid #e69f2b;box-shadow:0 0 28px #e7b03f68}
+.fx-hud-head{display:flex;justify-content:space-between;gap:6px;font-size:14px;font-weight:950;color:#a46a13}.fx-hud-head b{color:#8c477f}
+.fx-hud-detail{display:flex;justify-content:space-between;gap:8px;color:#9d805b;font-size:11px;margin:8px 0}
+.fx-hud-bar{height:8px;background:#f0e1bb;border-radius:999px;overflow:hidden}.fx-hud-bar span{display:block;height:100%;background:linear-gradient(90deg,#ed961d,#f7d340,#ff62a8);border-radius:999px;transition:width .3s}
+.fx-win{background:linear-gradient(110deg,#16805e,#0a5b62);color:#fff;padding:17px;text-align:center;border-radius:19px;margin-bottom:18px;box-shadow:0 7px 23px #189d763c}
+.fx-win.t2{background:linear-gradient(115deg,#205b91,#8150b7,#ab4bba)}.fx-win.t3{background:linear-gradient(115deg,#7e47cf,#d75a97,#e19938)}.fx-win.t4{background:linear-gradient(105deg,#ca438c,#8545d9,#e6ac24)}.fx-win.t5{background:linear-gradient(110deg,#d79c24,#e94c96,#7651d2,#2dbfac);box-shadow:0 0 30px #ecc05296}
+.fx-win strong{display:block;font-size:clamp(22px,6vw,29px);margin:4px 0;font-weight:1000}.fx-win .fx-icon{font-size:30px;display:block;animation:fxBop .55s ease-out both}.fx-win span{font-size:13px;font-weight:800}
+@keyframes fxBop{0%{transform:scale(.65)}65%{transform:scale(1.23)}100%{transform:scale(1)}}
+.fx-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;margin:10px 0;background:linear-gradient(110deg,#fff1c9,#f0fff8);border:1px solid #edd994;border-radius:12px;color:#765b29;font-size:12px;font-weight:800}.fx-meta b{color:#aa5b20}
+.fx-sound{display:flex;justify-content:flex-end;margin:8px 0 12px}.fx-sound button{border:1px solid #d9e1d8;background:white;border-radius:999px;color:#476469;font-size:12px;font-weight:850;padding:8px 13px;min-height:36px}
+@media(prefers-reduced-motion:reduce){#fx-layer{display:none!important}.fx-win .fx-icon{animation:none!important}.fx-hud-bar span{transition:none!important}}
