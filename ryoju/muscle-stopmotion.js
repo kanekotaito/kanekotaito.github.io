@@ -18,7 +18,7 @@ function figure(stage,pose,mode){
  '<div class="doll-photo-image" style="background-position:'+pos(frame)+'" data-photo-frame="'+frame+'"></div>'+
  '<div class="doll-joint doll-shoulder-left"></div><div class="doll-joint doll-shoulder-right"></div>'+
  '<div class="doll-camera-grain"></div><div class="doll-photo-vignette"></div>'+
- '<div class="doll-film-counter">● REC 12 fps</div>'+
+ '<div class="doll-film-counter">● REC 4 fps</div>'+
  '<div class="doll-stage-floor"></div></div>';
 }
 function mountSprite(){
@@ -74,7 +74,7 @@ function moveStopMotion(frameEl,container,stage,theme){
    frameEl.style.backgroundPosition=pos(f);
    frameEl.setAttribute("data-photo-frame",String(f));
    frameEl.style.transform="translate3d("+p.x+"px,"+p.y+"px,0) rotate("+p.turn+"deg) scale("+p.s+")";
-   if(counter)counter.textContent="● REC 12fps · "+String(i+1).padStart(2,"0")+" / "+String(count).padStart(2,"0");
+   if(counter)counter.textContent="● REC 4 fps · "+String(i+1).padStart(2,"0")+" / "+String(count).padStart(2,"0");
    if(i===1||i===Math.floor(count*.62)){shutter.classList.remove("snap");void shutter.offsetWidth;shutter.classList.add("snap");}
    if(i===count-1)frameEl.style.transform="translate3d(0,0,0) rotate(0deg) scale(1)";
   },i*245);
