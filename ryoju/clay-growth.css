@@ -1,0 +1,44 @@
+/* v12: continuous clay bulking and chunky stop-motion growth feedback */
+.clay-puppet-image{
+  transform:translate3d(0,0,0) scale(var(--growth-x,1),var(--growth-y,1));
+  transform-origin:50% 64%;
+}
+.clay-puppet.clay-grown .clay-puppet-image{
+  animation:clayBulkUp 940ms steps(7,end) both;
+}
+@keyframes clayBulkUp{
+  0%{transform:translate3d(0,7px,0) scale(var(--growth-prev-x,1),var(--growth-prev-y,1))}
+  28%{transform:translate3d(0,5px,0) scale(var(--growth-prev-x,1),var(--growth-prev-y,1))}
+  43%{transform:translate3d(0,-8px,0) scale(var(--growth-pop-x,1.07),var(--growth-pop-y,1.035))}
+  62%{transform:translate3d(0,-4px,0) scale(var(--growth-pop-x,1.07),var(--growth-pop-y,1.035))}
+  84%{transform:translate3d(0,2px,0) scale(var(--growth-x,1),var(--growth-y,1))}
+  100%{transform:translate3d(0,0,0) scale(var(--growth-x,1),var(--growth-y,1))}
+}
+.clay-growth-chip{
+  display:table;max-width:100%;margin:9px auto 2px;
+  padding:7px 12px;border-radius:999px;background:linear-gradient(90deg,#fff0c9,#c5f9db);
+  color:#264d44;font-size:11px;font-weight:950;text-align:center;
+  box-shadow:0 3px 12px #364f2524;
+}
+.clay-growth-hint{font-size:11px!important;line-height:1.65!important;color:#678578!important;margin:8px 0 0!important}
+.clay-mini-growth{
+  display:inline-block;margin-top:5px;padding:3px 8px;border-radius:999px;
+  background:#e3f7ce;color:#336f35;font-size:10px;font-weight:900;
+}
+.clay-growth-result{
+  position:relative;z-index:7;display:flex;flex-direction:column;align-items:center;
+  gap:3px;width:max-content;max-width:93%;margin:-7px auto 0;padding:8px 14px;
+  border-radius:14px;background:linear-gradient(100deg,#223e49ee,#1e695de8);
+  border:1px solid #fceba9;color:white;text-align:center;box-shadow:0 5px 25px #0008;
+}
+.clay-growth-result strong{font-size:clamp(17px,4vw,23px);font-weight:1000;color:#ffe186}
+.clay-growth-result span{font-size:11px;font-weight:800;color:#e8fcec}
+.clay-growth-result.is-growing{animation:clayGrowthBadge 880ms steps(4,end) both}
+@keyframes clayGrowthBadge{
+  0%{opacity:0;transform:scale(.72) translateY(15px)}
+  50%{opacity:1;transform:scale(1.08) translateY(-3px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+@media(prefers-reduced-motion:reduce){
+  .clay-puppet.clay-grown .clay-puppet-image,.clay-growth-result.is-growing{animation:none!important}
+}
