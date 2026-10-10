@@ -1,0 +1,95 @@
+/* Photographic miniature action figure, deliberately stepped stop-motion movement.
+   Frames provided by AI-generated photo sprite. No network dependencies. */
+.doll-photo{
+ position:relative; width:100%; height:auto; aspect-ratio:160/274; isolation:isolate;
+ overflow:hidden; border-radius:14px; background:#141c23; display:block;
+ border:2px solid #987e6160;box-shadow:inset 0 0 18px #1d13159c,0 15px 24px #080a206c;
+ transform:translateZ(0);contain:layout paint style;
+}
+.doll-photo-image{
+ position:absolute;inset:0;
+ background-repeat:no-repeat;background-size:800% 100%;
+ image-rendering:auto;
+ /* Stop-motion updates this transform frame by frame. No smooth transition. */
+ transition:none!important;
+ transform-origin:50% 78%;
+ will-change:transform,background-position;
+}
+.doll-set-light{
+ position:absolute;inset:-15%;z-index:2;pointer-events:none;
+ background:radial-gradient(ellipse at 27% 14%,#ffffff49,transparent 46%);
+ mix-blend-mode:screen;
+}
+.doll-camera-grain{
+ position:absolute;inset:0;z-index:3;pointer-events:none;
+ background-image:repeating-linear-gradient(35deg,#ffffff0c 0 1px,transparent 1px 4px);
+ opacity:.27;mix-blend-mode:overlay;
+}
+.doll-photo-vignette{
+ position:absolute;inset:0;z-index:4;pointer-events:none;
+ background:radial-gradient(ellipse at 50% 46%,transparent 37%,#08101a5e 82%,#050509d1);
+}
+.doll-film-counter{
+ position:absolute;left:8px;top:8px;z-index:7;background:#0c1024d1;
+ border:1px solid #ffffff6b;border-radius:6px;color:#eaf9ff;
+ padding:3px 6px;font:800 9px/1.4 ui-monospace,Menlo,monospace;
+ letter-spacing:.05em;text-shadow:0 1px 2px #000;
+}
+.doll-film-counter::first-letter{color:#ff6d71}
+.doll-stage-floor{
+ position:absolute;bottom:0;left:0;width:100%;height:7px;z-index:6;
+ background:linear-gradient(90deg,transparent,#ffe4a969,transparent);
+}
+.doll-joint{
+ position:absolute;z-index:4;pointer-events:none;
+ width:11px;height:11px;border:1px solid #e6b991a3;border-radius:50%;
+ background:radial-gradient(circle at 28% 30%,#f5d0acaa,#95634288);
+ box-shadow:0 0 3px #fff4;opacity:.35;top:31%;
+}
+.doll-shoulder-left{left:26%}.doll-shoulder-right{right:26%}
+.doll-shutter{
+ position:absolute;z-index:8;inset:0;opacity:0;pointer-events:none;
+ background:linear-gradient(40deg,#fff8c6,white,#cae7ff);
+}
+.doll-shutter.snap{animation:dollFlash .14s steps(2,end) both}
+@keyframes dollFlash{
+ 0%{opacity:0}45%{opacity:.76}100%{opacity:0}
+}
+.muscle-home-art .doll-photo{max-width:230px;margin:0 auto; border-radius:14px 14px 4px 4px;}
+.muscle-mini-pic{min-width:87px;width:94px;height:105px}
+.muscle-mini-pic .doll-photo{
+ width:82px;height:110px;aspect-ratio:auto;border:none;border-radius:8px 8px 0 0;
+ transform:translateY(4px);box-shadow:none;
+}
+.muscle-mini-pic .doll-film-counter,
+.muscle-mini-pic .doll-joint,
+.muscle-mini-pic .doll-camera-grain{display:none}
+.mqv-hero .doll-photo{
+ height:min(53vh,454px);width:auto;max-width:90vw;margin:auto;
+ aspect-ratio:160/274;border-radius:15px;
+ border:5px solid #fff5d488;
+ box-shadow:0 0 0 3px #ffedbd33,0 0 58px 16px #ffeab776,0 20px 35px #07092180;
+}
+.mqv-hero .doll-photo-image{animation:none!important}
+.mqv-hero .doll-film-counter{font-size:10px;padding:6px 9px}
+.mqv-hero .doll-joint{width:14px;height:14px;opacity:.43}
+.mqv-hero .doll-camera-grain{opacity:.39}
+.mqv-hero .doll-photo .doll-photo-image{filter:contrast(1.12) saturate(1.05)}
+.mqv-hero .doll-photo::before{
+ content:"STOP MOTION STUDIO";
+ position:absolute;z-index:6;right:7px;bottom:11px;
+ color:#fff9e3bb;font:800 8px/1 ui-monospace,Menlo,monospace;
+ letter-spacing:.08em;text-shadow:0 1px 4px black;pointer-events:none;
+}
+.mqv-stage-content .mqv-hero{max-height:min(55vh,475px)}
+/* Reframe photographic prop to emphasize the performer, without covering UI text. */
+@media(max-width:550px){
+.muscle-home-content{grid-template-columns:40% 1fr}
+.muscle-home-art .doll-photo{max-width:190px}
+.mqv-hero .doll-photo{height:min(51vh,420px);max-width:83vw}
+.mqv-hero .doll-photo .doll-film-counter{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+.doll-photo-image{will-change:auto!important;transition:none!important}
+.doll-shutter,.doll-shutter.snap{animation:none!important}
+}
