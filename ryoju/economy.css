@@ -1,0 +1,30 @@
+/* v6 Knowledge Vault shop, mobile first */
+.coin-shop{margin-top:25px;background:linear-gradient(160deg,#132e40,#244953 35%,#f3f8f3 35.1%);border-radius:22px;overflow:hidden;border:1px solid #d9e5e0;box-shadow:0 12px 30px #193c4430}
+.shop-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:23px 18px 24px;color:#fff}
+.shop-kicker{font-size:10px;letter-spacing:.22em;font-weight:900;color:#b5e3d6}
+.shop-heading h2{font-size:21px;letter-spacing:.025em;margin:8px 0}.shop-heading p{font-size:12px;line-height:1.7;color:#cde4dd;margin:7px 0 0}
+.coin-wallet{min-width:123px;text-align:right;border:1px solid #ffffff45;background:#ffffff18;padding:12px;border-radius:14px}
+.coin-wallet small{display:block;color:#dcefe0;font-size:10px;font-weight:800}.coin-wallet strong{display:block;font-size:22px;color:#ffe381;margin:7px 0;font-variant-numeric:tabular-nums;white-space:nowrap}.coin-wallet span{font-size:10px;color:#d5e7df}
+.shop-guide{margin:0 13px 15px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.shop-guide>div{background:#fff;border:1px solid #e3ece8;border-radius:12px;padding:11px 10px;min-width:0}
+.shop-guide b{display:block;color:#315f50;font-size:11px;line-height:1.4}.shop-guide small{display:block;color:#758b83;font-size:10px;line-height:1.5;margin-top:5px}
+.base-progress{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:0 13px 13px;padding:12px 13px;border-radius:12px;background:#e0f1e9;color:#236d56;font-size:12px}.base-progress b{font-size:13px}
+.pack-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 13px}
+.pack-card{background:#fff;border:1px solid #dbe7e1;border-radius:17px;padding:14px 12px;display:flex;flex-direction:column;min-width:0;position:relative}
+.pack-card.pack-ready{border:2px solid #eab44d;box-shadow:0 0 15px #f2c86c6b;background:linear-gradient(130deg,#fffefa,#fff6dc)}
+.pack-card.pack-owned{border-color:#a1d6c3;background:linear-gradient(125deg,#fff,#f0faf6)}
+.pack-card.pack-locked{background:#f9fbfa}
+.pack-top{display:flex;align-items:center;justify-content:space-between;gap:6px}.pack-num{font-size:10px;font-weight:950;color:#486d70}.pack-price{font-size:11px;color:#b27d18;font-weight:950;white-space:nowrap}
+.pack-card h3{font-size:16px;letter-spacing:-.025em;margin:14px 0 8px;color:#233f49}
+.pack-desc{font-size:11px;line-height:1.65;color:#849693;margin:0 0 12px}
+.pack-condition{font-size:11px;line-height:1.65;color:#697e79;margin:2px 0 12px;flex:1}
+.pack-action{width:100%;margin-top:auto;background:#126b55;color:#fff;font-weight:900;font-size:12px;min-height:45px;border-radius:12px;border:none;padding:10px}
+.pack-action.ready{background:linear-gradient(100deg,#c68b2c,#d9a527);color:#fff}
+.pack-action.muted{background:#e5ebe8;color:#8da19a;opacity:1}
+.pack-progress{font-size:11px;color:#3c8065;margin-bottom:12px;line-height:1.6}
+.pack-meter{height:7px;background:#dbeee6;border-radius:50px;overflow:hidden;margin-top:6px}.pack-meter span{height:100%;background:linear-gradient(90deg,#17ae80,#eac355);display:block;border-radius:50px}
+.pack-clear{font-size:10px;color:#b27a24;font-weight:900;margin:0 0 9px}
+.shop-footnote{padding:0 15px 15px;font-size:11px;line-height:1.75;color:#849591}
+.claim-toast{background:#fff8e3;color:#8a5c17;padding:12px 16px;border-radius:14px;border:1px solid #f1ce74;font-size:13px;font-weight:850;margin:14px 0}
+@media(max-width:550px){.shop-heading{flex-direction:column}.coin-wallet{align-self:stretch;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left}.coin-wallet strong{margin:0}.coin-wallet span{display:none}.shop-guide{grid-template-columns:1fr 1fr}.shop-guide>div:nth-child(3){grid-column:1/-1}.pack-card h3{font-size:14px}.pack-card{padding:12px 10px}.base-progress{flex-direction:column;align-items:flex-start;gap:5px}}
+@media(prefers-reduced-motion:reduce){.pack-action,.pack-card{animation:none}}
