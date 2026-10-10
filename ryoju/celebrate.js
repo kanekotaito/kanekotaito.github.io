@@ -1,0 +1,26 @@
+/* 猟銃所持考査 正解エフェクト v5 | lightweight, no libraries */
+(function(){
+"use strict";
+var layer=null,cleanup=null,engine=null;
+function level(xp){return Math.floor(Math.max(0,xp||0)/250)+1;}
+function nextGoal(streak){var marks=[3,5,10,15,20,30,50,75,100,150,200];for(var i=0;i<marks.length;i++)if(streak<marks[i])return marks[i];return Math.ceil((streak+1)/50)*50;}
+function tier(streak){return streak>=30?5:streak>=15?4:streak>=10?3:streak>=5?2:streak>=3?2:1;}
+function title(streak){return streak>=50?"🌌 COSMIC LEGEND!":streak>=30?"👑 GODLIKE!!":streak>=20?"🌈 ULTRA LEGEND!":streak>=15?"💎 INCREDIBLE!!":streak>=10?"⚡ UNSTOPPABLE!":streak>=5?"🔥 SUPER COMBO!":streak>=3?"✨ GREAT COMBO!":"🎯 正解！";}
+function bonus(streak){return 10+Math.min(90,streak*3);}
+function mark(streak){return [3,5,10,15,20,30,50,75,100,150,200].indexOf(streak)>=0;}
+function streak(s,idToQ){if(!s||s.mode==="exam")return 0;var index=s.index,chain=0;for(var i=index;i>=0;i--){var id=s.order[i];if(s.answers[id]===idToQ(id).a)chain++;else break;}return chain;}
+function escapeHtml(v){return String(v).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]});}
+function panel(n){var xp=bonus(n),t=tier(n);return '<div class="fx-win t'+t+'" aria-live="polite"><span class="fx-icon">'+(n>=20?'👑':n>=10?'🏆':n>=5?'💎':n>=3?'🔥':'✨')+'</span><strong>'+title(n)+'</strong><span>正解 +'+xp+' XP　｜　'+n+' 連続正解</span></div>';}
+function hud(n,db){var goal=nextGoal(n),from=goal<=3?0:n>=100?Math.floor(n/50)*50:n>=75?75:n>=50?50:n>=30?30:n>=20?20:n>=15?15:n>=10?10:n>=5?5:n>=3?3:0;var pct=Math.min(100,Math.max(0,Math.round(100*(n-from)/Math.max(1,goal-from))));return '<div class="fx-hud '+(n>=10?'wow':n>=3?'hot':'')+'"><div class="fx-hud-head"><span>🔥 '+n+' COMBO</span><b>Lv.'+level(db.fxXp)+' · '+db.fxXp+' XP</b></div><div class="fx-hud-detail"><span>次の覚醒まで、あと '+(goal-n)+' 問</span><span>累計 '+db.fxTotalCorrect+' 正解</span></div><div class="fx-hud-bar"><span style="width:'+pct+'%"></span></div></div>';}
+function soundButton(on){return '<div class="fx-sound"><button type="button" data-act="reward-sound" aria-pressed="'+on+'">'+(on?'🔊 効果音 ON':'🔇 効果音 OFF')+'</button></div>';}
+function meta(db){return '<div class="fx-meta"><span>🏆 <b>レベル '+level(db.fxXp)+'</b>　累計 '+db.fxTotalCorrect+' 正解</span><span>💎 <b>'+db.fxXp+' XP</b></span></div>';}
+function tone(n,allowed){if(!allowed)return;try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!engine)engine=new AC();if(engine.state==="suspended")engine.resume();var base=engine.currentTime,t=Math.min(5,tier(n)+1),scale=[523.25,659.25,783.99,1046.5,1318.5,1567.98];for(var i=0;i<t;i++){var o=engine.createOscillator(),v=engine.createGain(),at=base+i*.085;o.type="sine";o.frequency.setValueAtTime(scale[i],at);v.gain.setValueAtTime(.0001,at);v.gain.exponentialRampToValueAtTime(.045,at+.012);v.gain.exponentialRampToValueAtTime(.0001,at+.21);o.connect(v);v.connect(engine.destination);o.start(at);o.stop(at+.22);}}catch(e){}}
+function makeNode(tag,cls){var n=document.createElement(tag);n.className=cls;return n;}
+function celebrate(n,opt){opt=opt||{};if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;layer=document.getElementById('fx-layer');if(!layer)return;if(cleanup)clearTimeout(cleanup);layer.replaceChildren();var big=!!opt.big||mark(n),t=opt.big?5:tier(n),flash=makeNode('div','fx-flash');layer.appendChild(flash);
+var toast=makeNode('div','fx-toast'),word=makeNode('strong',''),tagline=makeNode('small','');word.textContent=opt.exam?'🏅 合格おめでとう！':opt.levelUp?'💫 LEVEL UP!':(big?title(n):(n>=3?'🔥 '+n+' COMBO!':'✨ 正解！'));tagline.textContent=opt.exam?'模試で実力を証明！':opt.levelUp?'レベル '+opt.levelUp+' 到達！':('+'+bonus(n)+' XP　'+n+'連続正解');toast.appendChild(word);toast.appendChild(tagline);layer.appendChild(toast);
+var amount=opt.exam?125:Math.min(116,15+t*16+(big?19:0)),palette=['#f7c12b','#ef569d','#6fdcf3','#b28cff','#72e9a2','#ffffff','#fa8136','#ffed9a'];for(var i=0;i<amount;i++){var star=i%9===0,bit=makeNode('i','fx-bit'+(star?' star':'')),angle=Math.random()*Math.PI*2,d=75+Math.random()*(90+t*35),dx=Math.cos(angle)*d,dy=Math.sin(angle)*d+70+Math.random()*60;
+bit.style.setProperty('--x',(22+Math.random()*56)+'%');bit.style.setProperty('--y',(25+Math.random()*38)+'%');bit.style.setProperty('--dx',dx+'px');bit.style.setProperty('--dy',dy+'px');bit.style.setProperty('--rot',(Math.random()*1100-550)+'deg');bit.style.setProperty('--w',(star?20+Math.random()*12:5+Math.random()*7)+'px');bit.style.setProperty('--h',(star?20:5+Math.random()*12)+'px');bit.style.setProperty('--r',(i%3===0?'50%':'2px'));bit.style.setProperty('--c',palette[i%palette.length]);bit.style.setProperty('--t',(1.15+Math.random()*.6)+'s');if(star)bit.textContent=['✦','★','✧'][i%3];layer.appendChild(bit);}
+cleanup=setTimeout(function(){if(layer)layer.replaceChildren();},2050);
+}
+window.Reward={level:level,bonus:bonus,tier:tier,title:title,streak:streak,panel:panel,hud:hud,soundButton:soundButton,meta:meta,tone:tone,celebrate:celebrate};
+})();
