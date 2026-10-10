@@ -1,0 +1,196 @@
+/* CLAY INTERACT v10: photo-rendered clay bodybuilder, turntable and touch reactions. */
+.clay-puppet{
+  position:relative;
+  aspect-ratio:142/234;
+  width:100%;
+  min-width:0;
+  overflow:hidden;
+  isolation:isolate;
+  background:radial-gradient(ellipse at 50% 38%,#477077 0%,#1b3c46 57%,#132931 100%);
+  border-radius:22px;
+  border:2px solid #ffffff35;
+  box-shadow:inset 0 1px 24px #ffffff15,inset 0 -10px 25px #02091485,0 13px 24px #0516235b;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.clay-puppet[data-interactive="1"]{
+  cursor:grab;
+  touch-action:none;
+  -webkit-touch-callout:none;
+  outline-offset:5px;
+}
+.clay-puppet[data-interactive="1"]:active{cursor:grabbing}
+.clay-puppet:focus-visible{outline:3px solid #ffe283}
+.clay-puppet-image{
+  position:absolute;
+  inset:0;
+  background-repeat:no-repeat;
+  background-position:0% 0%;
+  background-size:1200% 600%;
+  transform:translateZ(0);
+  transition:none!important;
+  will-change:background-position;
+  image-rendering:auto;
+  filter:contrast(1.06) saturate(1.10);
+}
+.clay-puppet-image.clay-action{background-size:800% 600%}
+.clay-softlight{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
+  background:linear-gradient(118deg,#ffffff16,transparent 30%,transparent 70%,#010e2882);
+  box-shadow:inset 0 0 24px #0a0c1d52;
+  mix-blend-mode:screen;
+}
+.clay-stage-shadow{
+  position:absolute;
+  z-index:0;
+  left:14%;
+  right:14%;
+  bottom:7%;
+  height:14%;
+  border-radius:50%;
+  background:#01090e70;
+  filter:blur(12px);
+}
+.clay-stage-caption{
+  z-index:4;
+  position:absolute;
+  left:11px;
+  top:10px;
+  background:#0c2536a1;
+  border:1px solid #e8f7e754;
+  border-radius:999px;
+  color:#ffefc7;
+  font:800 9px/1.4 ui-monospace,Menlo,monospace;
+  padding:4px 8px;
+  letter-spacing:.055em;
+  pointer-events:none;
+}
+.clay-love{
+  position:absolute;
+  z-index:5;
+  opacity:0;
+  top:20%;
+  right:9%;
+  font-size:clamp(22px,6vw,44px);
+  filter:drop-shadow(0 4px 7px #aa537da8);
+  pointer-events:none;
+}
+.clay-puppet.clay-petted .clay-love{animation:clayHeart .92s cubic-bezier(.17,.87,.33,1) both}
+.clay-puppet.clay-petted{box-shadow:inset 0 1px 24px #ffffff15,0 0 31px #ffb0d47c,0 12px 27px #05162378}
+.clay-puppet.clay-posing .clay-softlight{
+  animation:clayStudioFlash .48s steps(3,end) 3 alternate;
+}
+.muscle-home-art .clay-puppet{
+  width:min(100%,230px);
+  margin:0 auto 3px;
+  border-radius:17px;
+  background:radial-gradient(circle at 52% 41%,#466777,#142e3b 70%);
+  box-shadow:0 8px 23px #01122083,inset 0 0 21px #96b0a044;
+}
+.muscle-mini-pic{width:94px;min-width:94px;height:110px;overflow:hidden}
+.muscle-mini-pic .clay-puppet{
+  position:relative;
+  width:84px;
+  aspect-ratio:142/234;
+  height:138px;
+  border:none;
+  border-radius:12px 12px 3px 3px;
+  margin:13px 0 0 4px;
+  box-shadow:0 0 15px #15243070;
+}
+.muscle-mini-pic .clay-stage-caption,.muscle-mini-pic .clay-love{display:none}
+.clay-instructions{
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  gap:4px;
+  z-index:2;
+  padding:12px 17px;
+  background:linear-gradient(95deg,#06252f77,#2954608c);
+  border-top:1px solid #ffffff2b;
+  color:#d6fff6;
+  font-size:11px;
+}
+.clay-instructions>b{font-size:13px;color:#ffe3a9}
+.clay-instructions>span{font-size:12px;font-weight:750}
+.clay-instructions>small{font-size:10px;color:#b8ddd4}
+.clay-controls{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:1fr 1.1fr 1fr;
+  gap:8px;
+  padding:9px 16px 13px;
+  background:linear-gradient(95deg,#0a313da8,#1b5058b3);
+}
+.clay-controls button{
+  padding:9px 6px;
+  border-radius:12px;
+  background:#f2f9e9;
+  border:1px solid #a5d6bf;
+  color:#204c4b;
+  font-size:11px;
+  font-weight:950;
+  min-height:42px;
+  -webkit-tap-highlight-color:transparent;
+}
+.clay-controls button:active{background:#fff3b8;transform:scale(.98)}
+.clay-controls button[data-clay-btn="pet"]{
+  background:linear-gradient(100deg,#ffe39d,#ffd0a8);
+  border-color:#fff4c8;
+  color:#7b4c24;
+  font-size:12px;
+}
+.mqv-hero .clay-puppet{
+  margin:auto;
+  width:min(64vw,287px);
+  max-height:min(59vh,460px);
+  aspect-ratio:142/234;
+  border:5px solid #fff3bcac;
+  border-radius:23px;
+  background:radial-gradient(ellipse at 50% 43%,#6398a6,#10354e 70%,#05132c 95%);
+  box-shadow:0 0 48px 14px #f8ec967c,inset 0 0 45px #d3ffeb19,0 20px 34px #0a1737c1;
+}
+.mqv-hero .clay-puppet.clay-posing{animation:clayPoseImpact .48s steps(3,end) 3 alternate}
+.mqv-hero .clay-stage-caption{
+  top:13px;left:13px;
+  font-size:10px;
+}
+.mqv-hero .clay-softlight{background:linear-gradient(120deg,#ffffc629,transparent 45%,#03294352 80%,#f5e69b22)}
+.mqv-hero .clay-puppet-image{filter:contrast(1.13) saturate(1.16)}
+.mqv-theme-volcano .mqv-hero .clay-puppet{box-shadow:0 0 70px #ffae3796,inset 0 0 35px #da642561}
+.mqv-theme-galaxy .mqv-hero .clay-puppet{box-shadow:0 0 70px #c6a0ffab,inset 0 0 35px #ba85f45c}
+.mqv-theme-thunder .mqv-hero .clay-puppet{box-shadow:0 0 70px #f8f5bfa8,inset 0 0 35px #9caefc61}
+.mqv-theme-gold .mqv-hero .clay-puppet{box-shadow:0 0 70px #ffe47fc7,inset 0 0 35px #fff4ab52}
+@keyframes clayHeart{
+  0%{opacity:0;transform:translate(-10px,25px) scale(.2) rotate(-15deg)}
+  15%{opacity:1;transform:translate(0,0) scale(1.2) rotate(11deg)}
+  75%{opacity:1;transform:translate(5px,-36px) scale(1) rotate(-8deg)}
+  100%{opacity:0;transform:translate(17px,-66px) scale(.9)}
+}
+@keyframes clayStudioFlash{
+  0%{opacity:.2}
+  40%{opacity:.85;background:radial-gradient(ellipse at 55% 24%,#fff7c679,transparent 60%)}
+  100%{opacity:.5}
+}
+@keyframes clayPoseImpact{
+  0%{transform:scale(.96) rotate(-1deg)}
+  40%{transform:scale(1.055) rotate(1deg)}
+  100%{transform:scale(1)}
+}
+@media(max-width:580px){
+  .muscle-home-content{grid-template-columns:43% 1fr}
+  .muscle-home-art .clay-puppet{width:100%;max-width:195px}
+  .muscle-home-info{padding:4px 6px 10px 0}
+  .mqv-hero .clay-puppet{width:min(67vw,270px);max-height:min(56vh,420px)}
+  .clay-instructions{padding:10px 13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .clay-puppet.clay-petted .clay-love,
+ .clay-puppet.clay-posing .clay-softlight,
+ .mqv-hero .clay-puppet.clay-posing{animation:none!important}
+ .clay-puppet-image{will-change:auto!important}
+}
