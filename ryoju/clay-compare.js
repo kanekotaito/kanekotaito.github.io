@@ -16,9 +16,9 @@ function compare(stats){
  '<div class="growth-compare-detail" id="growth-compare-detail" '+(expanded?'':'hidden')+'>'+
  '<div class="growth-pair" data-growth-swipe="1" aria-label="左右にスワイプすると両方の人形が回転します">'+
  '<div class="growth-figure before"><div class="growth-figure-header"><span class="growth-chip">START</span><b>最初</b><small>筋肉 Lv.1</small></div>'+
- '<div class="growth-figure-model">'+M.clay.puppet(0,"before",false)+'</div><div class="growth-figure-caption">🌱 ひよっこトレーニー</div></div>'+
+ '<div class="growth-figure-model">'+M.clay.puppet(0,"before",false,0)+'</div><div class="growth-figure-caption">🌱 ひよっこトレーニー</div></div>'+
  '<div class="growth-figure after"><div class="growth-figure-header"><span class="growth-chip">NOW</span><b>現在</b><small>筋肉 Lv.'+level+'</small></div>'+
- '<div class="growth-figure-model">'+M.clay.puppet(stats.stage,"after",false)+'</div><div class="growth-figure-caption">🔥 '+safe(stats.name)+'</div></div>'+
+ '<div class="growth-figure-model">'+M.clay.puppet(stats.stage,"after",false,stats.power)+'</div><div class="growth-figure-caption">🔥 '+safe(stats.name)+'</div></div>'+
  '</div>'+
  '<div class="growth-rotate-controls"><button type="button" data-growth="left" aria-label="両方左に回す">↶ 左に回す</button><span>👆 二人を同時に360°回転</span><button type="button" data-growth="right" aria-label="両方右に回す">右に回す ↷</button></div>'+
  '<div class="growth-results" aria-label="最初と現在の成長記録">'+
