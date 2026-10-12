@@ -1,0 +1,85 @@
+/* MOTIVATION QUEST v13: frictionless goals, daily mastery and gentle stopping points */
+.mot-hero {
+  margin:12px 0 17px;
+  border-radius:21px;
+  padding:19px 17px 17px;
+  color:#fff;
+  overflow:hidden;
+  position:relative;
+  background:radial-gradient(circle at 92% 10%,#9ee9c43d,transparent 39%),
+   linear-gradient(134deg,#123b50,#18665e 58%,#173d55);
+  border:1px solid #b7e4c65e;
+  box-shadow:0 12px 26px #0a4d5040;
+}
+.mot-hero:before {
+ content:"";position:absolute;top:-65px;right:-72px;width:190px;height:190px;
+ border-radius:50%;border:25px solid #ffffff13;pointer-events:none;
+}
+.mot-tag{display:flex;align-items:center;justify-content:space-between;gap:7px;
+ position:relative;color:#c8fff0;font-size:10px;font-weight:900;letter-spacing:.17em}
+.mot-tag .mot-day{font-size:10px;letter-spacing:.02em;color:#b2d7d8}
+.mot-hero-main{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:17px 0 16px;position:relative}
+.mot-hero-main h2{font-size:clamp(24px,6vw,31px);font-weight:1000;line-height:1.22;margin:0 0 10px;letter-spacing:-.045em;color:#ffeca9}
+.mot-hero-main p{font-size:12px;color:#d6f7e9;line-height:1.65;margin:0}
+.mot-ring{width:85px;height:85px;min-width:85px;border-radius:50%;display:grid;place-items:center;
+ background:conic-gradient(#ffdc75 var(--mot-progress),#ffffff2d 0%);
+ padding:7px;box-shadow:0 0 18px #bdecb326}
+.mot-ring>div{width:100%;height:100%;border-radius:50%;background:#1a4c56;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.mot-ring strong{font-size:27px;line-height:1.1;color:#fff6d4;font-variant-numeric:tabular-nums}
+.mot-ring small{font-size:11px;color:#bdecd8;font-weight:900}
+.mot-track{height:9px;overflow:hidden;background:#ffffff30;border-radius:99px;margin-bottom:16px}
+.mot-track-progress{background:linear-gradient(90deg,#50ffe4,#fdd973,#ff9d83);height:100%;border-radius:99px;transition:width .4s}
+.mot-start-actions{position:relative;display:grid;grid-template-columns:1.1fr 1fr;gap:8px}
+.mot-start-actions button{border:0;min-height:53px;border-radius:13px;font-weight:950;font-size:13px;line-height:1.4;padding:9px 8px}
+.mot-start-actions .mot-main-btn{background:linear-gradient(115deg,#ffda67,#ffc56a);color:#543c16;box-shadow:0 5px 16px #a4873466}
+.mot-start-actions .mot-main-btn span{display:block;font-size:10px;color:#9a7226;font-weight:750}
+.mot-start-actions .mot-review-btn{background:#f5fffb;color:#146557;border:1px solid #b0e9ce}
+.mot-goal-chooser{display:flex;align-items:center;justify-content:flex-end;gap:6px;color:#cce6df;font-size:11px;margin-top:12px}
+.mot-goal-chooser>span{margin-right:5px}
+.mot-goal-chooser button{background:#ffffff16;color:#e3f9ee;border:1px solid #ffffff40;padding:5px 11px;border-radius:99px;font-size:11px;font-weight:900;min-height:31px}
+.mot-goal-chooser button.active{background:#ffdd83;color:#654316;border-color:#ffdd83}
+.mot-quests,.mot-collection{padding:15px 14px;border-radius:18px;margin:13px 0;border:1px solid #d7e7de;background:#fafffb}
+.mot-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px}
+.mot-section-head h3{font-size:15px;font-weight:950;color:#335d59;margin:0}
+.mot-section-head span{font-size:11px;color:#8ba19a}
+.mot-quests-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mot-quest{background:#fff;border-radius:13px;border:1px solid #e3ebe2;padding:10px;
+ display:flex;gap:7px;align-items:flex-start;min-width:0}
+.mot-quest-icon{font-size:21px}
+.mot-quest-copy{min-width:0;flex:1}
+.mot-quest-copy strong{display:block;color:#2d504c;font-size:12px;font-weight:950;line-height:1.4}
+.mot-quest-copy>span{display:block;color:#82938e;font-size:10px;line-height:1.5;min-height:29px;margin-top:4px}
+.mot-quest-end{color:#5a7f71;font-size:10px;font-weight:1000;text-align:right;min-width:38px}
+.mot-quest-end small{display:block;color:#b08b39;white-space:nowrap;margin-top:7px;font-size:10px}
+.mot-quest-meter{height:5px;background:#eff3e7;border-radius:99px;overflow:hidden;margin-top:9px}
+.mot-quest-meter span{height:100%;display:block;border-radius:99px;background:linear-gradient(90deg,#26a88d,#e3bc58)}
+.mot-quest.mot-complete{background:linear-gradient(125deg,#f4fff5,#fff7da);border-color:#e8cb7b}
+.mot-quest.mot-complete .mot-quest-end{color:#18836b}
+.mot-badges{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.mot-medal{width:45px;height:45px;display:grid;place-items:center;font-size:22px;border-radius:13px;background:#fff2ce;border:1px solid #e4d29f}
+.mot-medal.locked{filter:grayscale(1);opacity:.45;background:#e9e9e9}
+.mot-collection p{font-size:12px;color:#6f6041;margin:6px 0}
+.mot-collection>small{font-size:11px;color:#85948e}
+.mot-quiz-strip{background:linear-gradient(105deg,#fff2ce,#e5fff6);
+ border-radius:14px;border:1px solid #e8d28c;padding:12px;margin:10px 0}
+.mot-quiz-strip>span,.mot-quiz-strip>strong{display:inline-block;color:#316f61;font-size:11px;font-weight:950}
+.mot-quiz-strip>strong{color:#91632a;margin:0 7px}
+.mot-quiz-line{height:5px;background:#ddede3;overflow:hidden;border-radius:99px;margin-top:8px}
+.mot-quiz-line>span{display:block;height:100%;background:linear-gradient(90deg,#38bfa3,#f7c262);border-radius:99px}
+.mot-answer-quests{background:linear-gradient(100deg,#fff4ce,#e4fff8);border:1px solid #ead390;padding:11px 13px;border-radius:13px;margin:9px 0 13px}
+.mot-answer-quests>strong{display:block;color:#477359;font-size:12px;margin-bottom:7px}
+.mot-award{display:flex;justify-content:space-between;gap:12px;color:#95641e;font-size:13px;font-weight:850;margin:5px 0}
+.mot-award b{white-space:nowrap;color:#d58c27}
+.mot-result{background:linear-gradient(120deg,#f7fff5,#fff0c5);border-radius:17px;border:1px solid #dcd0a2;margin:15px 0;padding:18px;text-align:center}
+.mot-result h3{margin:0 0 10px;font-size:19px;color:#345d4d}
+.mot-result p{color:#698178;font-size:12px;line-height:1.6}
+.mot-result-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.mot-result-actions button{border:0;border-radius:12px;background:#146d54;color:white;font-weight:900;min-height:48px;font-size:12px;padding:7px 9px}
+.mot-result-actions button.mot-stop{background:#fff;color:#426356;border:1px solid #badbc9}
+#mot-spark{position:fixed;z-index:990;pointer-events:none;top:max(15vh,85px);left:0;width:100%;display:flex;justify-content:center;padding:0 12px}
+.mot-spark-content{max-width:min(93vw,500px);text-align:center;padding:15px 18px;background:linear-gradient(110deg,#ffcf63,#fff5bb,#b6f7dc);
+ border-radius:18px;border:3px solid #fff;color:#76512d;font-size:clamp(18px,5vw,26px);font-weight:1000;
+ box-shadow:0 12px 35px #18163a77;animation:motSparkBounce 1.55s ease-out forwards}
+@keyframes motSparkBounce{0%{transform:translateY(45px) scale(.4);opacity:0}25%{transform:translateY(-5px) scale(1.12);opacity:1}65%{transform:scale(1);opacity:1}100%{transform:translateY(-35px) scale(.94);opacity:0}}
+@media(max-width:410px){.mot-quests-grid{grid-template-columns:1fr}.mot-hero{padding:15px 12px}.mot-ring{width:75px;height:75px;min-width:75px}.mot-start-actions button{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.mot-spark-content{animation:none}.mot-track-progress{transition:none}}
