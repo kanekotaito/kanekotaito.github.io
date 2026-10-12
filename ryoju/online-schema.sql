@@ -30,7 +30,8 @@ drop policy if exists ryoju_delete_own on public.ryoju_public_players;
 create policy ryoju_delete_own on public.ryoju_public_players for delete to authenticated using (owner_id = (select auth.uid()));
 -- Restrict direct table access to published/statistical columns for untrusted browsers.
 revoke all on public.ryoju_public_players from public;
-grant select on public.ryoju_public_players to anon;
-grant select, insert, update, delete on public.ryoju_public_players to authenticated;
+-- Whitelist public columns: internal auth user ID and local device IDs stay hidden.
+grant select (id,display_name,mastered,packs,best,recovered,muscle_stage,updated_at) on public.ryoju_public_players to anon, authenticated;
+grant insert, update, delete on public.ryoju_public_players to authenticated;
 -- Ownership checks occur on the server via RLS; publishable key is safe to expose.
 -- Anonymous auth sessions are tied to one browser. Switching device will not confer ownership.
