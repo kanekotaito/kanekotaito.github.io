@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071611">
+  <meta name="description" content="競馬予想の仮説を立て、確率を推定し、事前予想と実際の結果を比較する分析ラボ。">
+  <title>KEIBA LAB | 競馬予想研究所</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="./" aria-label="KEIBA LAB ホーム">
+        <span class="brandmark">K<span>↗</span></span>
+        <span class="brandtext"><strong>KEIBA LAB</strong><small>競馬予想研究所</small></span>
+      </a>
+      <div class="side-caption">WORKSPACE / 研究室</div>
+      <nav class="nav" aria-label="画面切り替え">
+        <button class="navitem active" data-view="lab"><span>◈</span> 予想ラボ</button>
+        <button class="navitem" data-view="history"><span>▤</span> 予想記録</button>
+        <button class="navitem" data-view="bench"><span>◎</span> 手法を比較</button>
+        <button class="navitem" data-view="data"><span>▥</span> データ管理</button>
+        <button class="navitem" data-view="guide"><span>↗</span> 分析の考え方</button>
+      </nav>
+      <div class="sidebottom">
+        <div class="side-card"><span class="pulse"></span> <span id="dataStatus">デモデータを読込中</span><p>未来の勝ち馬を知るためでなく、予想の質を上げるための研究室。</p></div>
+        <div class="footnote">v1.0 · local-first · 架空データ標準搭載</div>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="crumb">STUDY / <strong id="viewName">予想ラボ</strong></div>
+        <div class="top-actions"><span class="clock" id="today"></span><button class="smallbtn" id="exportTop">↧ データを保存</button></div>
+      </header>
+      <main id="main" aria-live="polite"></main>
+      <footer class="sitefooter">KEIBA LAB <span>予想は確率であり、結果の保証ではありません。デモの馬・レース・結果は全て架空です。</span></footer>
+    </div>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
