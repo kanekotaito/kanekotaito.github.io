@@ -1,47 +1,50 @@
-/* v16 Online dojo and delete controls. */
-.player-chip-group{display:flex;align-items:center;gap:1px;min-width:0;border:1px solid #ffffff30;border-radius:22px;padding:2px;background:#ffffff10}
-.player-chip-group .player-chip{border:0}
-.player-delete{width:32px;height:32px;border:1px solid #ffe3c168;background:#fff4d320;color:#ffddc6;border-radius:50%;font-size:14px;font-weight:950;flex-shrink:0}
-.player-delete:hover,.player-delete:focus-visible{background:#fff1e3;color:#a63f3a}
-.player-hud-actions .online-shortcut{background:linear-gradient(100deg,#b9edff,#c9f9cd,#fff2ae);color:#155a74;border-color:#87dadd}
-.online-page{display:flex;flex-direction:column;gap:16px;padding-bottom:45px}
-.online-banner{padding:23px 18px;border-radius:20px;background:radial-gradient(ellipse at 15% 0,#7c5ac0,#253b77 56%,#101f47);color:#fff;box-shadow:0 10px 26px #263b6560}
-.online-banner>span{color:#b2f8fb;font-size:10px;letter-spacing:.2em;font-weight:950}
-.online-banner h2{font-size:23px;color:#ffeba6;margin:8px 0}
-.online-banner p{font-size:12px;color:#e0e8ff;line-height:1.8;margin:8px 0 0}
-.online-unconfigured,.online-self,.online-roster{border:1px solid #d4e6df;border-radius:18px;padding:16px;background:#fff}
-.online-unconfigured{border-color:#e6cd94;background:linear-gradient(120deg,#fff7db,#fff)}
-.online-unconfigured h3,.online-self h3,.online-roster h3{font-size:17px;margin:0 0 11px}
-.online-unconfigured p,.online-self p,.online-roster p{font-size:12px;color:#64817c;line-height:1.8}
-.online-privacy{padding:10px;background:#f4faf6;border-radius:10px;border:1px solid #d6ebe0}
-.online-publish-btn{width:100%;min-height:51px;border:0;border-radius:13px;padding:11px;background:#167a60;color:white;font-size:14px;font-weight:900}
-.online-published{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.online-published>span{grid-column:1/-1;color:#17805f;font-weight:850;font-size:12px}
-.online-published button,.online-roster-title button{min-height:40px;background:#e9f5f0;border:1px solid #cce4d9;color:#23755f;font-weight:850;border-radius:11px;padding:7px 9px;font-size:12px}
-.online-published .online-unpublish{background:#fff5ee;color:#a35845;border-color:#ebc8ad}
-.online-roster-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.online-roster-title h3{margin:0}
-.online-loading{border:1px solid #cce4d9;background:#ecfaf3;border-radius:12px;padding:12px;font-size:12px;color:#386d5d}
-.online-error{padding:13px;background:#fff1e9;border:1px solid #edb7a3;border-radius:12px;color:#9f4e3e;font-size:12px;line-height:1.6}
-.online-no-opponents{background:#f2f6f5;border-radius:12px;padding:18px;color:#718784;font-size:12px;line-height:1.8}
-.online-roster label{display:block;font-size:12px;font-weight:900;color:#3c6a61;margin:11px 0 7px}
-.online-roster select{display:block;max-width:100%;width:100%;border:1px solid #c5d7d0;border-radius:12px;padding:12px;background:white;color:#26495a;font-size:14px}
-.online-match-stage{display:grid;grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr);align-items:center;gap:4px;padding:15px 7px;margin:14px 0;border-radius:19px;background:radial-gradient(ellipse at 50% 30%,#446b93,#26356c 60%,#141945);overflow:hidden}
-.online-fighter{display:flex;align-items:center;flex-direction:column;color:#ecfbfb;gap:5px;min-width:0;text-align:center}
-.online-fighter h3{font-size:clamp(13px,3.2vw,19px);color:#ffebaa;margin:0 0 7px;overflow-wrap:anywhere}
-.online-fighter-pic{max-width:160px;min-width:0;width:100%;display:flex;justify-content:center}
-.online-fighter-pic .clay-puppet{max-width:152px;width:100%;border:2px solid #ffeebf83;box-shadow:0 0 20px #aabaff6e}
-.online-fighter-score{display:flex;align-items:center;gap:4px}
-.online-fighter-score strong{font-size:23px;color:#ffe68c}
-.online-fighter-score small,.online-fighter>span{font-size:10px;color:#d2e6f3}
-.online-versus{display:flex;flex-direction:column;align-items:center;gap:13px}
-.online-versus strong{font-size:28px;color:#ffe681;text-shadow:0 3px #9f4bb6}
-.online-arms{font-size:22px;line-height:1.3;text-align:center;word-break:break-all;filter:drop-shadow(0 0 6px #ffeda6)}
-.online-match-stage.fighting .online-versus{animation:onlineDuel .27s steps(3,end) infinite alternate}
-.online-match-stage.fighting .online-fighter-pic{animation:onlineDuel .46s steps(2,end) infinite alternate}
-.online-countdown{text-align:center;padding:14px;background:#fff3c2;border-radius:12px;color:#975b34;font-weight:950}
-.online-footnote{padding:12px;font-size:11px;line-height:1.8;color:#7d8b8a;background:#f1f6f3;border-radius:12px}
-@keyframes onlineDuel{to{transform:translateY(-8px) rotate(3deg) scale(1.04)}}
-.player-small-name{color:#396957;font-size:11px;font-weight:900}
-@media(max-width:520px){.online-match-stage{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr);gap:2px}.online-fighter-pic .clay-puppet{max-width:130px}.online-arms{font-size:15px}.online-versus strong{font-size:23px}.player-chip{padding:7px 9px}}
-@media(prefers-reduced-motion:reduce){.online-match-stage.fighting .online-versus,.online-match-stage.fighting .online-fighter-pic{animation:none!important}}
+/* Online arena v16, cloud directory and arm wrestling. */
+.player-chip-group{display:inline-flex;align-items:center;gap:0;background:#ffffff10;border-radius:99px;overflow:hidden;border:1px solid #ffffff4c}
+.player-chip-group .player-chip{border:none;border-radius:99px 0 0 99px}
+.player-chip-group .player-delete{
+ min-width:35px;min-height:36px;padding:6px 9px;border:0;border-left:1px solid #ffffff36;
+ border-radius:0 99px 99px 0;background:#e97b754a;color:#fff3e9;font-size:13px;font-weight:950;
+}
+.player-chip-group .player-delete:disabled{opacity:.36}
+.online-arena{border:1px solid #b8d0d4;background:linear-gradient(140deg,#eef9f6,#f9f4fe 65%,#fff7e5);border-radius:21px;padding:0 0 14px;margin:17px 0;overflow:hidden;box-shadow:0 8px 24px #183b5f24}
+.online-header{background:linear-gradient(122deg,#183c59,#495694,#297a74);color:#fff;padding:20px 17px}
+.online-header>span{font-size:10px;letter-spacing:.2em;color:#c0ede5;font-weight:950}
+.online-header h2{font-size:21px;line-height:1.4;margin:7px 0 10px;color:#ffedb3}
+.online-header p{font-size:12px;line-height:1.8;color:#e3f1f5;margin:0}
+.online-arena>div:not(.online-header),.online-arena>p{margin-left:14px;margin-right:14px}
+.online-offline,.online-status,.online-error{padding:14px 13px;border-radius:13px;font-size:12px;line-height:1.7}
+.online-offline{margin-top:13px;background:#fff7e6;border:1px solid #edcf94;color:#8e743b}
+.online-offline b{font-size:14px;color:#976027}
+.online-offline p{margin:7px 0 0}
+.online-status{background:#ffffffa3;color:#61877e}
+.online-error{background:#fff1ee;color:#ae4b43;border:1px solid #e5bbb4}
+.online-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:13px}
+.online-actions button{min-height:42px;padding:10px 7px;border:1px solid #9bcec1;background:#146a6b;color:#fff;font-weight:950;border-radius:11px;font-size:12px}
+.online-actions .online-refresh{background:#fff;color:#456e78}
+.online-actions .online-unpublish{background:#fff1ed;color:#b66155;border-color:#e4c4b9}
+.online-private{font-size:11px;color:#528574;line-height:1.8}
+.online-count{padding:12px 14px;background:#fff;border:1px solid #d8e5e7;border-radius:12px;font-size:14px;color:#316267;margin-top:11px;margin-bottom:10px}
+.online-count strong{color:#b17038;font-size:19px}
+.online-selects{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px;margin-bottom:12px}
+.online-selects label{min-width:0;font-weight:900;color:#356c69;font-size:12px;display:flex;flex-direction:column;gap:7px}
+.online-selects select{min-width:0;width:100%;background:#fff;border:1px solid #c0d7cf;border-radius:11px;padding:10px 5px;min-height:44px;color:#294954;font-size:12px}
+.online-fight{display:block;width:calc(100% - 28px);margin:12px 14px;border:0;border-radius:15px;background:linear-gradient(112deg,#e76377,#934fd1,#e5b052);color:#fff;font-size:16px;font-weight:1000;min-height:52px;box-shadow:0 5px 18px #b85ea96a}
+.online-fineprint{font-size:10px;color:#7c9291;line-height:1.8}
+.net-results{border:2px solid #e5c888;border-radius:18px;padding:13px;background:linear-gradient(125deg,#fff2d2,#ffe6f6,#e2faff);margin-top:13px}
+.net-results>h3{font-size:21px;margin:4px 0 12px;color:#984f79;text-align:center}
+.net-fighters{display:grid;grid-template-columns:minmax(0,1fr) 35px minmax(0,1fr);gap:3px;align-items:center}
+.net-versus{text-align:center;font-weight:1000;color:#cc668e;font-size:19px}
+.net-wrestler{display:flex;flex-direction:column;align-items:center;min-width:0;border:1px solid #efe0d1;border-radius:14px;background:#fff9f4c9;padding:8px 5px}
+.net-wrestler-name{color:#5f557f;font-size:14px;font-weight:950;max-width:100%;overflow-wrap:anywhere;text-align:center}
+.net-puppet{max-width:100%;width:128px;margin:8px auto}
+.net-puppet .clay-puppet{width:100%;box-shadow:0 5px 17px #25143b3a}
+.net-wrestler-strength{display:flex;align-items:center;flex-direction:column;gap:2px;color:#965e36}
+.net-wrestler-strength strong{font-size:21px}
+.net-wrestler-strength span{font-size:10px}
+.net-wrestler>small{font-size:10px;line-height:1.5;text-align:center;color:#7f8990;margin-top:7px}
+.net-rounds{display:flex;flex-direction:column;gap:7px;margin-top:13px}
+.net-round{display:flex;flex-direction:column;gap:5px;background:#fff;padding:10px;border-radius:10px;font-size:12px}
+.net-round b{color:#587081}
+.net-round span{font-weight:900;color:#957052}
+.net-round strong{color:#bc5692;margin:0 5px}
+@media(max-width:500px){.online-header{padding:17px 13px}.online-selects select{font-size:11px}.net-puppet{width:115px}.net-wrestler-name{font-size:12px}}
