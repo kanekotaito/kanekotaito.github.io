@@ -40,9 +40,15 @@ function getClient(){
  return promise;
 }
 async function user(client){
- var result=await client.auth.getUser();
- if(result.error&&result.error.message&&!result.data?.user)throw result.error;
- if(result.data&&result.data.user)return result.data.user;
+ // getUser() returns AuthSessionMissingError for first-time visitors. Use
+ // getSession() to distinguish a new visitor from a failed authenticated request.
+ var session=await client.auth.getSession();
+ if(session.error)throw session.error;
+ if(session.data&&session.data.session){
+  var result=await client.auth.getUser();
+  if(result.error)throw result.error;
+  if(result.data&&result.data.user)return result.data.user;
+ }
  var signed=await client.auth.signInAnonymously();
  if(signed.error)throw new Error("匿名プレイヤー登録が無効です。Supabase側でAnonymous Sign-Insを有効化してください。");
  if(!signed.data||!signed.data.user)throw new Error("プレイヤー認証に失敗しました。");
