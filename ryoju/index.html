@@ -103,8 +103,8 @@ if(action==='sr-filter'||action==='sr-detail-filter'){recordView=recordView||{ta
 if(action==='sr-more'){recordView=recordView||{tab:'answers'};recordView.limit=(recordView.limit||40)+40;render();return;}
 if(action==='sr-export'){try{save();StudyRecords.exportFile(DB);}catch(err){window.alert('保存できませんでした。Safariで開いてやり直してください。\n'+String(err.message||err));}return;}
 if(action==='sr-import'){
- var fileInput=document.createElement('input');fileInput.type='file';fileInput.accept='.json,application/json';
- fileInput.onchange=function(){var file=fileInput.files&&fileInput.files[0];if(!file)return;if(file.size>15*1024*1024){window.alert('ファイルが大きすぎます。15MB以内の記録を選んでください。');return;}
+ var fileInput=document.createElement('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.style.display='none';document.body.appendChild(fileInput);
+ fileInput.onchange=function(){var file=fileInput.files&&fileInput.files[0];if(fileInput.parentNode)fileInput.parentNode.removeChild(fileInput);if(!file)return;if(file.size>15*1024*1024){window.alert('ファイルが大きすぎます。15MB以内の記録を選んでください。');return;}
  var reader=new FileReader();reader.onload=function(){try{var imported=StudyRecords.validateRestore(String(reader.result||''));
  if(!window.confirm('現在の学習データをバックアップ内容で置き換えます。現在の記録を残したい場合は先にバックアップしてください。復元しますか？'))return;
  DB=imported;StudyRecords.ensure(DB,Q);QuizStore.ensure(DB,Q);Motivation.ensure(DB);recordView=null;save();renderHome();window.scrollTo(0,0);
