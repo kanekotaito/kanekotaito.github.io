@@ -60,7 +60,7 @@ async function register(store,localId){
  if(!found)throw new Error("プレイヤーが見つかりません。");
  var db=window.PlayerProfiles.read(store,localId),c=await getClient(),u=await user(c);
  var payload=dataFor(found.name,db,localId,u.id);
- var r=await c.from(CONFIG.table||"ryoju_public_players").upsert(payload,{onConflict:"owner_id,local_player_id"}).select("id").single();
+ var r=await c.from(CONFIG.table||"ryoju_public_players").insert(payload).select("id").single();
  if(r.error)throw r.error;
  if(!r.data||!r.data.id)throw new Error("オンライン登録を確認できませんでした。");
  setLink(store,localId,r.data.id);
@@ -73,7 +73,8 @@ async function publish(store,localId,db){
  if(!found)return false;
  var c=await getClient(),u=await user(c),payload=dataFor(found.name,db||window.PlayerProfiles.read(store,localId),localId,u.id);
  // The ID is never exposed as an update value and RLS restricts the owner.
- var r=await c.from(CONFIG.table||"ryoju_public_players").update(payload).eq("id",remote).eq("owner_id",u.id).select("id");
+ var updated={display_name:payload.display_name,mastered:payload.mastered,packs:payload.packs,best:payload.best,recovered:payload.recovered,muscle_stage:payload.muscle_stage,updated_at:payload.updated_at};
+ var r=await c.from(CONFIG.table||"ryoju_public_players").update(updated).eq("id",remote).select("id");
  if(r.error)throw r.error;
  if(!r.data||r.data.length!==1)throw new Error("オンライン公開データの更新権限がありません。ブラウザーが変わった可能性があります。");
  return true;
@@ -93,7 +94,7 @@ function queuePublish(store,db){
 async function unregister(store,localId){
  var remote=getLink(store,localId);if(!remote)return false;
  var c=await getClient(),u=await user(c);
- var result=await c.from(CONFIG.table||"ryoju_public_players").delete().eq("id",remote).eq("owner_id",u.id).select("id");
+ var result=await c.from(CONFIG.table||"ryoju_public_players").delete().eq("id",remote).select("id");
  if(result.error)throw result.error;
  if(!result.data||result.data.length!==1)throw new Error("公開プロフィールを削除できませんでした。学習記録を保護するためローカル削除も中止します。");
  setLink(store,localId,null);
