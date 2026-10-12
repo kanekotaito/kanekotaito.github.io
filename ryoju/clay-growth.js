@@ -9,9 +9,12 @@ var oldHome=M.home,oldCompact=M.compact,oldCelebrate=M.celebrate,oldAttempt=Stor
 var recent=null;
 
 function physique(power){
- var p=Math.max(0,Number(power)||0);
+ // Moderate but permanent growth, from the very first mastered question.
+ // The cross-faded clay-body images handle real muscle size changes at each step.
+ // Small scale changes keep the entire figure in frame even near 600/600.
+ var p=Math.max(0,Math.min(800,Number(power)||0));
  var rate=Math.log1p(p);
- return {x:1+rate*0.038,y:1+rate*0.027,power:p};
+ return {x:1+rate*0.014+p*0.000025,y:1+rate*0.012+p*0.000016,power:p};
 }
 function setBody(el,power,before,animate){
  if(!el)return;
@@ -37,13 +40,14 @@ function applyHtml(html,db,kind){
   if(art){
    var chip=document.createElement("div");chip.className="clay-growth-chip";
    var percent=Math.round((physique(stat.power).x-1)*100);
-   chip.textContent=stat.power>0?"💪 体格が "+percent+"% ボリュームアップ":"🌱 まずは1問、筋肉を育てよう";
+   chip.textContent=stat.power>0?"💪 筋肉パワー "+stat.power+"　体格＋"+percent+"%":"🌱 まずは1問、筋肉を育てよう";
    art.appendChild(chip);
   }
   var info=t.content.querySelector(".muscle-home-info");
   if(info){
    var detail=document.createElement("p");detail.className="clay-growth-hint";
-   detail.textContent="1問習得するたびに少しずつ巨大化。節目では人形そのものが進化！";
+   var marks=M.clay.growthMarks||[0,15,50,110,230,450],next=marks.find(function(v){return v>stat.power;});
+   detail.textContent=(next?"次の大きな体格変化まで、あと "+(next-stat.power)+" パワー。":"最大級の体格に到達！さらに筋肉量が少しずつ増加中。")+" 正解して新しい問題を習得するたび、現在の人形が育ちます。";
    info.appendChild(detail);
   }
  }
@@ -51,7 +55,7 @@ function applyHtml(html,db,kind){
   var mini=t.content.querySelector(".muscle-mini-text");
   if(mini){
    var note=document.createElement("span");note.className="clay-mini-growth";
-   note.textContent=justGrew?"⬆ 筋肉がまた育った！":"⬆ 1問ごとに成長中";
+   note.textContent=justGrew?"💪 ＋"+(stat.power-recent.before)+" 筋肉パワー！":"💪 筋肉 "+stat.power+" パワー";
    mini.appendChild(note);
   }
  }
@@ -83,7 +87,7 @@ M.celebrate=function(db,opt){
   label.className="clay-growth-result"+(grew?" is-growing":"");
   if(grew){
    var gain=now-recent.before;
-   label.innerHTML='<strong>💪 筋肉＋'+gain+'！</strong><span>肩・胸・腕がひとまわり成長！</span>';
+   label.innerHTML='<strong>💪 筋肉＋'+gain+'！</strong><span>新しく習得した問題で体が大きくなった！</span>';
   }else{
    label.innerHTML='<strong>✨ 復習クリア！</strong><span>鍛えた知識を定着！</span>';
   }
