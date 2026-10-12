@@ -6,7 +6,7 @@ window.KEIBA_FEATURES=(()=>{
  const mean=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
  const shrink=(signal,sample,prior=50,k=3)=>signal===null?null:clamp((signal*sample+prior*k)/(sample+k));
  function runsBefore(h,race){
-  const cutoff=String(race.date||'');
+  const cutoff=String(race.asOf&&/^\d{4}-\d{2}-\d{2}/.test(race.asOf)&&race.asOf.slice(0,10)<race.date?race.asOf.slice(0,10):race.date||'');
   return (Array.isArray(h.pastRuns)?h.pastRuns:[])
    .filter(p=>p&&typeof p.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(p.date)&&p.date<cutoff&&n(p.finish)>0&&n(p.fieldSize)>1&&n(p.finish)<=n(p.fieldSize))
    .sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20);
