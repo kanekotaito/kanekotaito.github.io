@@ -57,9 +57,9 @@ async function user(client){
 function dataFor(name,db,localId,ownerId){
  var stat=window.PlayerProfiles.stats(db),muscle=window.Muscle&&window.Muscle.stats?window.Muscle.stats(db):{stage:0};
  return {owner_id:ownerId,local_player_id:String(localId),display_name:String(name).slice(0,16),
-  mastered:Math.max(0,Math.min(600,stat.mastered)),packs:Math.max(0,Math.min(8,stat.packs)),
-  best:Math.max(0,Math.min(50,stat.best)),recovered:Math.max(0,Math.min(600,stat.recovered)),
-  muscle_stage:Math.max(0,Math.min(14,muscle.stage)),updated_at:new Date().toISOString()};
+  mastered:Math.max(0,Math.floor(stat.mastered)),packs:Math.max(0,Math.floor(stat.packs)),
+  best:Math.max(0,Math.min(50,stat.best)),recovered:Math.max(0,Math.floor(stat.recovered)),practice_correct:Math.max(0,Math.floor(stat.practiceCorrect||0)),
+  muscle_stage:Math.max(0,Math.floor(muscle.stage)),updated_at:new Date().toISOString()};
 }
 async function register(store,localId){
  var found=window.PlayerProfiles.users(store).find(function(x){return x.id===localId;});
@@ -79,7 +79,7 @@ async function publish(store,localId,db){
  if(!found)return false;
  var c=await getClient(),u=await user(c),payload=dataFor(found.name,db||window.PlayerProfiles.read(store,localId),localId,u.id);
  // The ID is never exposed as an update value and RLS restricts the owner.
- var updated={display_name:payload.display_name,mastered:payload.mastered,packs:payload.packs,best:payload.best,recovered:payload.recovered,muscle_stage:payload.muscle_stage,updated_at:payload.updated_at};
+ var updated={display_name:payload.display_name,mastered:payload.mastered,packs:payload.packs,best:payload.best,recovered:payload.recovered,muscle_stage:payload.muscle_stage,practice_correct:payload.practice_correct,updated_at:payload.updated_at};
  var r=await c.from(CONFIG.table||"ryoju_public_players").update(updated).eq("id",remote).select("id");
  if(r.error)throw r.error;
  if(!r.data||r.data.length!==1)throw new Error("オンライン公開データの更新権限がありません。ブラウザーが変わった可能性があります。");
@@ -113,20 +113,20 @@ async function deleteProfile(store,id){
 async function roster(){
  var c=await getClient();
  var result=await c.from(CONFIG.table||"ryoju_public_players")
-  .select("id,display_name,mastered,packs,best,recovered,muscle_stage,updated_at")
+  .select("id,display_name,mastered,packs,best,recovered,muscle_stage,practice_correct,updated_at")
   .order("mastered",{ascending:false}).limit(150);
  if(result.error)throw result.error;
  return Array.isArray(result.data)?result.data:[];
 }
 function fighter(name,stat,side){
- var stage=Math.max(0,Math.min(14,Number(stat.muscle_stage)||0));
- var puppet=window.Muscle&&window.Muscle.clay?window.Muscle.clay.puppet(stage,"online-"+side,false,Math.max(0,stat.mastered+stat.packs*25)):"💪";
+ var stage=Math.max(0,Number(stat.muscle_stage)||0);
+ var puppet=window.Muscle&&window.Muscle.clay?window.Muscle.clay.puppet(stage,"online-"+side,false,Math.max(0,stat.mastered+stat.packs*25+(Number(stat.practice_correct)||0)*.5)):"💪";
  return '<div class="online-fighter"><h3>'+safe(name)+'</h3><div class="online-fighter-pic">'+puppet+'</div><div class="online-fighter-score"><strong>'+stat.mastered+'</strong><small>問習得</small></div>'+
   '<span>完全クリア '+stat.packs+'パック</span><span>模試最高 '+(stat.best||"―")+'/50</span><span>復習克服 '+stat.recovered+'問</span></div>';
 }
 function stats(db){
  var x=window.PlayerProfiles.stats(db),m=window.Muscle&&window.Muscle.stats?window.Muscle.stats(db):{stage:0};
- return {mastered:x.mastered,packs:x.packs,best:x.best,recovered:x.recovered,muscle_stage:m.stage};
+ return {mastered:x.mastered,packs:x.packs,best:x.best,recovered:x.recovered,muscle_stage:m.stage,practiceCorrect:x.practiceCorrect};
 }
 function match(localDB,opponent){return window.PlayerProfiles.roundupPublic(stats(localDB),opponent);}
 function render(store,db,state){
