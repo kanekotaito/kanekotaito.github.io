@@ -2,7 +2,7 @@
 'use strict';
 window.KEIBA_FEATURES=(()=>{
  const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
- const n=v=>Number.isFinite(Number(v))?Number(v):null;
+ const n=v=>(v===null||v===undefined||v==='')?null:(Number.isFinite(Number(v))?Number(v):null);
  const mean=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
  const shrink=(signal,sample,prior=50,k=3)=>signal===null?null:clamp((signal*sample+prior*k)/(sample+k));
  function runsBefore(h,race){
