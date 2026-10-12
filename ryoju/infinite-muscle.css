@@ -1,41 +1,87 @@
-/* Infinite Muscle v17. Keeps the rotating clay sprite and overlays progressive
-   non-human anatomy; respects small screens and reduced motion. */
-.infinite-mutation{isolation:isolate;background:radial-gradient(ellipse at 50% 43%,#4f2b81 0%,#20195c 54%,#0c1230 100%)!important;box-shadow:0 0 30px #9561fa65,inset 0 0 32px #f3c9ff42,0 11px 26px #06052077!important}
-.infinite-mutation .clay-puppet-image{filter:hue-rotate(var(--evo-hue,0deg)) saturate(1.35) contrast(1.12);opacity:.9}
-.evo-shell{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden;transform:scale(var(--evo-scale,1));transform-origin:50% 58%}
-.evo-svg{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 9px #dda8ffb0);opacity:.96}
-.evo-halo{position:absolute;inset:18% 11% 12%;border-radius:50%;box-shadow:0 0 25px #ce8cff,inset 0 0 28px #bc74f2;opacity:.6;mix-blend-mode:screen}
-.evo-ring{position:absolute;inset:13% 5%;border:2px solid #e6adffb5;border-radius:50%;box-shadow:0 0 17px #e2b5ff,0 0 26px #8157fa;transform:rotate(-22deg) scaleX(.82);opacity:.82}
-.evo-ring-two{inset:21% -12%;transform:rotate(26deg) scaleX(.76);border-color:#8af9ff;opacity:.43}
-.evo-sigil{position:absolute;top:3%;right:8%;font-size:clamp(15px,5vw,26px);font-weight:1000;color:#f6ddff;text-shadow:0 0 12px #d3abff}
-.evo-limbs,.evo-wings,.evo-core{transition:opacity .24s ease}
-.mutation-1 .evo-limbs,.mutation-1 .evo-wings,.mutation-1 .evo-core{opacity:0}
-.mutation-1 .evo-horns{opacity:.8}
-.mutation-1 .evo-ring,.mutation-1 .evo-halo{opacity:.18}
-.mutation-2 .evo-limbs{opacity:1}.mutation-2 .evo-wings,.mutation-2 .evo-core{opacity:0}
-.mutation-3 .evo-limbs,.mutation-3 .evo-wings{opacity:1}.mutation-3 .evo-core{opacity:0}
-.mutation-4 .evo-core,.mutation-4 .evo-limbs,.mutation-4 .evo-wings{opacity:1}
-.mutation-4 .clay-puppet-image{opacity:.4;filter:hue-rotate(var(--evo-hue,0deg)) saturate(2) blur(1px)}
-.infinite-mutation[data-evolution-era="2"] .evo-halo,.infinite-mutation[data-evolution-era="3"] .evo-halo{box-shadow:0 0 40px #96e7ff,inset 0 0 32px #bb71ff}
-.infinite-mutation[data-evolution-era="2"] .evo-svg{filter:hue-rotate(80deg) drop-shadow(0 0 12px #e0a8ff)}
-.infinite-mutation[data-evolution-era="3"] .evo-svg{filter:hue-rotate(185deg) drop-shadow(0 0 12px #80ffff)}
-.infinite-mutation[data-clay-angle="2"] .evo-svg,.infinite-mutation[data-clay-angle="10"] .evo-svg{transform:scaleX(.77)}
-.infinite-mutation[data-clay-angle="3"] .evo-svg,.infinite-mutation[data-clay-angle="9"] .evo-svg{transform:scaleX(.55)}
-.infinite-mutation[data-clay-angle="4"] .evo-svg,.infinite-mutation[data-clay-angle="8"] .evo-svg{transform:scaleX(.36)}
-.infinite-mutation[data-clay-angle="5"] .evo-svg,.infinite-mutation[data-clay-angle="7"] .evo-svg{transform:scaleX(.18)}
-.infinite-mutation[data-clay-angle="6"] .evo-svg{transform:scaleX(-1)}
-.infinite-mutation.clay-posing .evo-svg{animation:evoThrob .53s steps(3,end) 3}
-.battle-ring.is-fighting .infinite-mutation .evo-svg,
-.online-match-stage.fighting .infinite-mutation .evo-svg{animation:evoThrob .4s steps(2,end) infinite alternate}
-@keyframes evoThrob{from{scale:.97;filter:drop-shadow(0 0 6px #b47dff)}to{scale:1.06;filter:drop-shadow(0 0 14px #ffdcff)}}
-.infinite-progress-line{padding:8px 10px;margin-top:9px!important;background:#efe5ff;color:#633b96!important;border:1px solid #d0b7ef;border-radius:10px;font-size:12px!important;font-weight:900}
+/* Infinite Muscle v19: authentic clay/photo bodybuilder look.
+   Keep the rotating 3D-like source sprites. No drawn limbs, horns, wings or cores. */
+.bodybuilder-evo{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  background:radial-gradient(ellipse 70% 62% at 51% 36%,#514d50 0%,#292d31 44%,#111923 82%,#0c1119 100%)!important;
+  border-color:#dcc1a37d!important;
+  box-shadow:0 12px 26px #06080d91,inset 0 0 22px #070d1780,0 0 22px #977e5b28!important;
+}
+.bodybuilder-evo .clay-puppet-image{
+  /* Never flatten the body into an SVG. The original 360-degree frames still rotate. */
+  filter:contrast(1.13) saturate(1.11) brightness(1.045);
+  transform-origin:50% 62%;
+  image-rendering:auto;
+}
+.bodybuilder-evo .clay-growth-next{
+  /* Keep its JavaScript-set opacity for smooth transitions between body frames. */
+  mix-blend-mode:normal;
+}
+.bodybuilder-evo .clay-softlight{
+  background:linear-gradient(110deg,#fff5dc1e 0%,transparent 34%,transparent 62%,#04070b83 100%);
+  mix-blend-mode:screen;
+  opacity:.78;
+}
+.bodybuilder-evo .clay-stage-caption{
+  color:#fff0d5;background:#171a20b8;border-color:#ead6ab77;
+}
+.bb-stage-light{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+}
+.bb-stage-light .bb-key,.bb-stage-light .bb-rim,.bb-stage-light .bb-floor{
+  display:block;position:absolute;pointer-events:none;
+}
+.bb-stage-light .bb-key{
+  inset:4% 6% 20%;
+  background:radial-gradient(ellipse 55% 49% at 45% 24%,
+    rgba(255,233,202,.20) 0%,rgba(255,228,192,.09) 26%,transparent 74%);
+  mix-blend-mode:screen;
+  opacity:var(--bb-sheen,.5);
+}
+.bb-stage-light .bb-rim{
+  inset:6% 5% 14%;border-radius:44%;
+  background:radial-gradient(ellipse 56% 56% at 84% 43%,
+    rgba(191,213,236,.19),rgba(174,200,224,.05) 42%,transparent 74%);
+  filter:blur(3px);
+  mix-blend-mode:screen;
+}
+.bb-stage-light .bb-floor{
+  bottom:4%;left:16%;right:16%;height:13%;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.43),rgba(0,0,0,.12) 55%,transparent 77%);
+  filter:blur(6px);
+}
+.bodybuilder-evo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:linear-gradient(126deg,transparent 0%,rgba(255,255,255,.025) 32%,transparent 47%,rgba(12,14,19,.06) 78%,transparent 100%);
+}
+/* Different levels get stronger definition, without recolouring realistic skin. */
+.bodybuilder-evo.mass-phase-1 .clay-puppet-image{filter:contrast(1.13) saturate(1.10) brightness(1.04)}
+.bodybuilder-evo.mass-phase-2 .clay-puppet-image{filter:contrast(1.16) saturate(1.11) brightness(1.045)}
+.bodybuilder-evo.mass-phase-3 .clay-puppet-image{filter:contrast(1.19) saturate(1.12) brightness(1.045)}
+.bodybuilder-evo.mass-phase-4 .clay-puppet-image{filter:contrast(1.22) saturate(1.13) brightness(1.05)}
+.bodybuilder-evo.mass-phase-4{
+  box-shadow:0 13px 32px #06080da8,inset 0 0 20px #04080d8c,0 0 24px #e0bb7642!important;
+}
+.bodybuilder-evo.clay-posing .bb-stage-light .bb-key{animation:bbStudioLight .62s ease-in-out 2 alternate}
+.battle-ring.is-fighting .bodybuilder-evo .bb-stage-light .bb-rim,
+.online-match-stage.fighting .bodybuilder-evo .bb-stage-light .bb-rim{
+  animation:bbStudioLight .65s ease-in-out infinite alternate;
+}
+@keyframes bbStudioLight{from{opacity:.45}to{opacity:.96}}
+.infinite-progress-line{
+  padding:8px 10px;margin-top:9px!important;border-radius:10px;
+  background:#f6efe5;color:#5e492f!important;border:1px solid #d9c7a9;
+  font-size:12px!important;font-weight:900;
+}
 @media(max-width:500px){
  .infinite-progress-line{font-size:11px!important}
- .evo-ring{border-width:1px}
- .evo-sigil{font-size:16px}
- .wrestler-avatar .infinite-mutation,.online-fighter-pic .infinite-mutation{box-shadow:0 0 17px #ae86ff,inset 0 0 15px #eabaff33!important}
+ .wrestler-avatar .bodybuilder-evo,.online-fighter-pic .bodybuilder-evo{
+  box-shadow:0 6px 17px #080a1299,0 0 12px #d1b48a33!important;
+ }
 }
 @media(prefers-reduced-motion:reduce){
- .infinite-mutation .evo-svg{animation:none!important}
- .infinite-mutation .evo-shell{transition:none!important}
+ .bodybuilder-evo .bb-stage-light .bb-key,.bodybuilder-evo .bb-stage-light .bb-rim{
+  animation:none!important;
+ }
 }
