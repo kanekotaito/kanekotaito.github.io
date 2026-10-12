@@ -60,20 +60,18 @@ function create(store,name){
  return {id:id,name:val};
 }
 function remove(store,id){
- var idx=getIndex(store);
- var found=idx.players.find(function(p){return p.id===id;});
+ var idx=getIndex(store),found=idx.players.find(function(p){return p.id===id;});
  if(!found)throw new Error("プレイヤーが見つかりません。");
- if(idx.players.length<=1)throw new Error("最後のプレイヤーは削除できません。もう1人登録してから削除してください。");
- // Verify record readability before any writes.
  read(store,id);
  var remain=idx.players.filter(function(p){return p.id!==id;});
+ if(!remain.length){
+  var guest="guest-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
+  store.setItem(key(guest),JSON.stringify(blank()));
+  remain=[{id:guest,name:"ゲスト",createdAt:Date.now()}];
+ }
  var next={version:1,active:idx.active===id?remain[0].id:idx.active,players:remain};
- // Index is committed before deleting the private profile so a failed index write
- // cannot remove learning history.
  store.setItem(INDEX_KEY,JSON.stringify(next));
  store.removeItem(key(id));
- // An explicit deletion of the originally migrated Taito profile removes the
- // earlier duplicate as well, so it cannot silently resurrect on a fresh browser.
  if(id===DEFAULT_ID)store.removeItem(OLD_KEY);
  return {name:found.name,active:next.active};
 }
@@ -104,6 +102,18 @@ function stats(db){
  var power=k1+k2+k3+k4;
  return {mastered:mastered,packs:packs,best:best,recovered:recovered,studyPower:power,breakdown:[k1,k2,k3,k4]};
 }
+function roundupPublic(a,b){
+ function norm(x){return {mastered:Math.min(600,Math.max(0,Number(x.mastered)||0)),packs:Math.min(8,Math.max(0,Number(x.packs)||0)),best:Math.min(50,Math.max(0,Number(x.best)||0)),recovered:Math.min(600,Math.max(0,Number(x.recovered)||0))};}
+ var left=norm(a),right=norm(b);
+ var rr=[
+  {name:"第1戦・知識の筋力",scoreA:left.mastered*10+left.packs*60,scoreB:right.mastered*10+right.packs*60},
+  {name:"第2戦・模試の技",scoreA:left.mastered*5+Math.max(0,left.best-30)*35,scoreB:right.mastered*5+Math.max(0,right.best-30)*35},
+  {name:"第3戦・復習の粘り",scoreA:left.mastered*7+left.packs*100+Math.min(200,left.recovered*5),scoreB:right.mastered*7+right.packs*100+Math.min(200,right.recovered*5)}
+ ];
+ var winsA=0,winsB=0;rr.forEach(function(r){r.winner=r.scoreA===r.scoreB?"draw":r.scoreA>r.scoreB?"left":"right";if(r.winner==="left")winsA++;if(r.winner==="right")winsB++;});
+ var scoreA=rr.reduce(function(n,r){return n+r.scoreA;},0),scoreB=rr.reduce(function(n,r){return n+r.scoreB;},0);
+ return {left:left,right:right,rounds:rr,scoreA:winsA,scoreB:winsB,pointA:scoreA,pointB:scoreB,winner:winsA!==winsB?(winsA>winsB?"left":"right"):(scoreA===scoreB?"draw":scoreA>scoreB?"left":"right")};
+}
 function roundup(a,b){
  var strengthA=stats(a),strengthB=stats(b);
  var rounds=[
@@ -118,10 +128,10 @@ function roundup(a,b){
  return {left:strengthA,right:strengthB,rounds:rounds,winner:winner,scoreA:victoriesA,scoreB:victoriesB,pointA:totalA,pointB:totalB};
 }
 function profileBar(store){
- var idx=getIndex(store),options=idx.players.map(function(p){return '<div class="player-chip-group"><button type="button" class="player-chip '+(p.id===idx.active?"current":"")+'" data-profile-action="switch" data-profile-id="'+escapeHtml(p.id)+'" aria-pressed="'+(p.id===idx.active)+'">'+(p.id===idx.active?"👑 ":"💪 ")+escapeHtml(p.name)+'</button><button type="button" class="player-delete" data-profile-action="delete" data-profile-id="'+escapeHtml(p.id)+'" aria-label="'+escapeHtml(p.name)+' を削除する" title="プレイヤー削除" '+(idx.players.length===1?"disabled":"")+'>✕</button></div>';}).join("");
+ var idx=getIndex(store),options=idx.players.map(function(p){return '<div class="player-chip-group"><button type="button" class="player-chip '+(p.id===idx.active?"current":"")+'" data-profile-action="switch" data-profile-id="'+escapeHtml(p.id)+'" aria-pressed="'+(p.id===idx.active)+'">'+(p.id===idx.active?"👑 ":"💪 ")+escapeHtml(p.name)+'</button><button type="button" class="player-delete" data-profile-action="delete" data-profile-id="'+escapeHtml(p.id)+'" aria-label="'+escapeHtml(p.name)+' を削除する" title="プレイヤー削除" >✕</button></div>';}).join("");
  return '<section class="player-hud" aria-label="プレイヤー切り替え"><div class="player-hud-title"><span>YOUR MUSCLE TEAM</span><strong>👤 現在のプレイヤー：'+escapeHtml(active(store).name)+'</strong></div>'+
  '<div class="player-chips">'+options+'</div>'+
- '<div class="player-hud-actions"><button type="button" data-profile-action="create">＋ 新しいプレイヤー</button><button type="button" data-profile-action="rename">✏️ 名前変更</button><button type="button" class="battle-shortcut" data-profile-action="battle">🏆 マッチョ腕相撲</button></div>'+
+ '<div class="player-hud-actions"><button type="button" data-profile-action="create">＋ 新しいプレイヤー</button><button type="button" data-profile-action="rename">✏️ 名前変更</button><button type="button" class="battle-shortcut" data-profile-action="battle">🏆 この端末で腕相撲</button><button type="button" class="battle-shortcut online-shortcut" data-profile-action="online">🌐 みんなとオンライン腕相撲</button></div>'+
  '<p class="player-hud-note">同じiPhoneのこのブラウザー内で、それぞれの記録を別々に保存します。別のスマホとは自動同期されません。</p></section>';
 }
 function wrestler(name,db,side){
@@ -159,5 +169,5 @@ function battle(store,pick,phase,result){
  markup+='<p class="battle-note">この腕相撲は学習成果を比べるローカル対戦です。勝敗に偶然の課金要素や連打ボーナスはありません。腕相撲でコインや筋肉パワーは増減しません。</p></div>';
  return markup;
 }
-window.PlayerProfiles={setup:setup,getIndex:getIndex,read:read,save:save,users:users,active:active,rename:rename,create:create,switchTo:switchTo,remove:remove,safeName:safeName,stats:stats,roundup:roundup,profileBar:profileBar,battle:battle,keys:{index:INDEX_KEY,dataPrefix:DATA_PREFIX,legacy:OLD_KEY}};
+window.PlayerProfiles={setup:setup,getIndex:getIndex,read:read,save:save,users:users,active:active,rename:rename,create:create,switchTo:switchTo,remove:remove,safeName:safeName,stats:stats,roundup:roundup,roundupPublic:roundupPublic,profileBar:profileBar,battle:battle,keys:{index:INDEX_KEY,dataPrefix:DATA_PREFIX,legacy:OLD_KEY}};
 })();
