@@ -79,7 +79,7 @@ function restore(){
  try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}');return saved&&typeof saved==='object'?saved:{}}catch{return{}}
 }
 const persisted=restore(), DEMO=makeDemo();
-const state={view:'lab',races:DEMO.concat(Array.isArray(persisted.imported)?persisted.imported.filter(validateRace):[]),records:Array.isArray(persisted.records)?persisted.records:[],preset:PRESETS[persisted.preset]?persisted.preset:'balanced',weights:normalizeWeights(persisted.weights||PRESETS.balanced.weights),raceId:persisted.raceId||DEMO[10].id,selectedId:null,revealed:new Set(),benchScope:'all',rawDataTab:'csv'};
+const state={view:'lab',races:DEMO.concat(Array.isArray(persisted.imported)?persisted.imported.filter(validateRace):[]),records:Array.isArray(persisted.records)?persisted.records:[],preset:PRESETS[persisted.preset]?persisted.preset:'balanced',weights:normalizeWeights(persisted.weights||PRESETS.balanced.weights),raceId:persisted.raceId||DEMO[10].id,selectedId:null,revealed:new Set(),benchScope:'all',benchGroup:'all',benchPeriod:'all',rawDataTab:'csv'};
 if(!state.races.some(r=>r.id===state.raceId))state.raceId=DEMO[10].id;
 function store(){
  try{localStorage.setItem(KEY,JSON.stringify({v:VERSION,imported:state.races.filter(r=>r.type!=='demo'),records:state.records.slice(-800),preset:state.preset,weights:state.weights,raceId:state.raceId}));return true}catch{toast('容量上限です。JSONを保存してデータを整理してください。');return false}
@@ -187,17 +187,37 @@ function recordDetail(rec){
 function benchmark(){
  const scope=state.benchScope;
  const available=state.races.filter(r=>Array.isArray(r.result)&&r.result.length>0);
- const races=available.filter(r=>scope==='all'||(scope==='demo'?r.type==='demo':r.type!=='demo')).slice().sort((a,b)=>a.date.localeCompare(b.date));
+ const subset=available.filter(r=>scope==='all'||(scope==='demo'?r.type==='demo':r.type!=='demo')).filter(r=>{
+  switch(state.benchGroup){
+   case 'turf':return r.surface==='芝';
+   case 'dirt':return r.surface==='ダート';
+   case 'wet':return ['重','不良','稍重'].includes(r.going);
+   case 'short':return Number(r.distance)<=1600;
+   case 'long':return Number(r.distance)>1600;
+   default:return true;
+  }
+ }).sort((a,b)=>a.date.localeCompare(b.date));
+ const cut=Math.max(1,Math.floor(subset.length*.7));
+ const races=state.benchPeriod==='train'?subset.slice(0,cut):state.benchPeriod==='test'?subset.slice(cut):subset;
  const strategies=[...Object.entries(PRESETS).filter(([k])=>k!=='custom').map(([key,v])=>({key,label:v.label,weights:normalizeWeights(v.weights)})),{key:'custom',label:'自分の仮説',weights:state.weights}];
  const sets=strategies.map(method=>{
   const stats=races.map(r=>metrics(calculate(r,method.weights,450),r)).filter(Boolean);
   return {...method,starts:stats.length,hits:sum(stats.map(x=>x.hit)),winrate:avg(stats.map(x=>x.hit)),logloss:avg(stats.map(x=>x.logloss)),brier:avg(stats.map(x=>x.brier)),roi:stats.length?sum(stats.map(x=>x.returned))/(stats.length*100):null,paid:sum(stats.map(x=>x.returned))};
  }).sort((a,b)=>a.logloss-b.logloss);
  const scopePick='<div class="segment"><button data-scope="all" class="'+(scope==='all'?'active':'')+'">全データ</button><button data-scope="demo" class="'+(scope==='demo'?'active':'')+'">架空データのみ</button><button data-scope="imported" class="'+(scope==='imported'?'active':'')+'">取込データのみ</button></div>';
+ const groupChoices=[['all','全条件'],['turf','芝'],['dirt','ダート'],['wet','道悪'],['short','1600m以下'],['long','1601m以上']];
+ const groupPick='<div class="segment">'+groupChoices.map(([id,label])=>'<button data-group="'+id+'" class="'+(state.benchGroup===id?'active':'')+'">'+label+'</button>').join('')+'</div>';
+ const periodPick='<div class="segment"><button data-period="all" class="'+(state.benchPeriod==='all'?'active':'')+'">全期間</button><button data-period="train" class="'+(state.benchPeriod==='train'?'active':'')+'">古い70%（開発用）</button><button data-period="test" class="'+(state.benchPeriod==='test'?'active':'')+'">新しい30%（検証用）</button></div><p class="hint">レース開催日の順で分割。期間が少ない場合はデータが空になることがあります。繰り返し検証用区間を見てモデルを調整すると厳密な未使用データではなくなります。</p>';
+ const calibrationPoints=races.flatMap(r=>calculate(r,state.weights,100).rows.map(h=>({p:h.win,y:h.id===r.result[0]?1:0})));
+ const buckets=[[0,.05],[.05,.10],[.10,.20],[.20,.35],[.35,1.001]];
+ const calibration='<div class="tablewrap"><table class="smalltable"><thead><tr><th>予想勝率帯</th><th>出走件数</th><th>平均予想勝率</th><th>実際の1着率</th><th>勝ち馬数</th></tr></thead><tbody>'+buckets.map(([lo,hi])=>{
+  const bin=calibrationPoints.filter(x=>x.p>=lo&&x.p<hi);const wins=sum(bin.map(x=>x.y));
+  return '<tr><td>'+(100*lo).toFixed(0)+'〜'+(100*Math.min(hi,1)).toFixed(0)+'%</td><td>'+bin.length+'</td><td>'+(bin.length?pct(avg(bin.map(x=>x.p))):'—')+'</td><td>'+(bin.length?pct(wins/bin.length):'—')+'</td><td>'+wins+'</td></tr>';
+ }).join('')+'</tbody></table></div><p class="hint">「自分の仮説」の確率校正を確認します。デモや少数のレースでは大きくばらつきます。予想と実際の割合が近いほど、確率配分が良い可能性があります。</p>';
  const summary='<div class="chartgrid"><div class="kpi"><span>結果登録済みレース</span><strong>'+races.length+'</strong><small>時系列順に集計</small></div><div class="kpi"><span>比較する仮説</span><strong>'+strategies.length+'</strong><small>保存された重みで評価</small></div><div class="kpi"><span>評価する勝ち馬</span><strong>'+races.length+'</strong><small>各レース1着馬</small></div><div class="kpi"><span>もっとも小さい Log Loss</span><strong>'+(races.length?fmt(sets[0].logloss,3):'—')+'</strong><small>小さいほど良い</small></div></div>';
  const table='<div class="tablewrap"><table class="smalltable"><thead><tr><th>仮説</th><th>1着的中</th><th>Log Loss ↓</th><th>Brier ↓</th><th>仮想単勝回収率</th></tr></thead><tbody>'+sets.map((s,i)=>'<tr><td><strong>'+(i===0&&races.length?'★ ':'')+escapeHtml(s.label)+'</strong></td><td>'+(races.length?s.hits+'/'+s.starts+' ('+pct(s.winrate)+')':'—')+'</td><td class="numtd">'+(races.length?fmt(s.logloss,3):'—')+'</td><td>'+ (races.length?fmt(s.brier,3):'—')+'</td><td>'+((s.roi!==null)?pct(s.roi):'—')+'</td></tr>').join('')+'</tbody></table></div><div class="notice mt12">比較順位は読み込んだレースだけに対する結果です。ここで重みを調整して最良の手法を選ぶと、データへの過適合が起こります。評価用の未使用レースを別に用意してください。</div>';
  const guide='<div class="grid2"><div><h3>Log Loss とは</h3><p class="paneltext">実際に勝った馬へ高い勝率を付けられたかを見る指標。勝った馬の予想確率が低いほど厳しく減点されます。小さいほど良い。</p></div><div><h3>Brier Score とは</h3><p class="paneltext">全出走馬の勝率予想と、実際に1着だったか（1 / 0）の二乗差を合計。全馬の勝率の配分を測ります。小さいほど良い。</p></div><div><h3>仮想単勝回収率とは</h3><p class="paneltext">各レースで勝率1位の馬に100円購入したと仮定した払戻 / 合計額。単勝オッズは事前スナップショットと仮定。利益を保証しません。</p></div><div><h3>本番に近づくには</h3><p class="paneltext">開催日で学習期間と検証期間を分ける。調教・人気・馬場は必ず発走前のスナップショットを残す。血統や騎手評価も未来の実績で更新しない。</p></div></div>';
- return intro('その予想法、本当に強い？','同じ出走表を複数の仮説で評価。正解率だけでなく、確率予想の誤差も見比べます。','METHOD BENCHMARK')+scopePick+summary+card('仮説別パフォーマンス',table,'<small>BEST: LOWEST LOG LOSS</small>')+'<div class="spaced">'+card('検証指標の読み方',guide)+'</div>';
+ return intro('その予想法、本当に強い？','同じ出走表を複数の仮説で評価。正解率だけでなく、確率予想の誤差も見比べます。','METHOD BENCHMARK')+scopePick+'<div class="spaced">'+groupPick+'</div><div class="spaced">'+periodPick+'</div>'+summary+card('仮説別パフォーマンス',table,'<small>BEST: LOWEST LOG LOSS</small>')+'<div class="spaced">'+card('予想確率は実際に当たっている？',calibration,'<small>CALIBRATION CHECK</small>')+'</div><div class="spaced">'+card('検証指標の読み方',guide)+'</div>';
 }
 function dataView(){
  const imported=state.races.filter(r=>r.type!=='demo');
@@ -227,7 +247,7 @@ function render(){
  $$('.navitem').forEach(b=>{b.classList.toggle('active',b.dataset.view===state.view);b.setAttribute('aria-current',b.dataset.view===state.view?'page':'false')});
  $('#dataStatus').textContent='分析可能: '+state.races.length+'レース · 取込 '+state.races.filter(x=>x.type!=='demo').length+'件';
 }
-function go(view){state.view=view;render();window.scrollTo({top:0,behavior:'instant'})}
+function go(view){state.view=view;render();window.scrollTo({top:0,behavior:'auto'})}
 function showRecord(id){const rec=state.records.find(x=>x.id===id);if(!rec)return;state.view='record';$('#viewName').textContent='予想記録 / 詳細';$('#main').innerHTML=recordDetail(rec);$$('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.view==='history'));window.scrollTo(0,0)}
 function download(name,data,type='application/json;charset=utf-8'){const blob=new Blob([data],{type});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}
 const CSV_HEADERS=['race_id','date','race_name','course','surface','distance','going','weather','pace','as_of','class_grade','track_bias_inside','track_bias_outside','horse_id','number','horse_name','age','sex','draw','weight','jockey','trainer','sire','dam_sire','style','form_text','last_run_days','odds','result_position','past_runs_json','jockey_stats_json','trainer_stats_json','pedigree_stats_json','training_score',...KEYS.filter(k=>k!=='market').map(k=>'score_'+k)];
@@ -308,6 +328,8 @@ MAIN.addEventListener('click',e=>{
  if(target.dataset.horse){state.selectedId=target.dataset.horse;render();return}
  if(target.dataset.preset){setPreset(target.dataset.preset);return}
  if(target.dataset.scope){state.benchScope=target.dataset.scope;render();return}
+ if(target.dataset.group){state.benchGroup=target.dataset.group;render();return}
+ if(target.dataset.period){state.benchPeriod=target.dataset.period;render();return}
  if(target.dataset.record){showRecord(target.dataset.record);return}
  if(target.dataset.deleteRecord){if(confirm('この予想記録を削除しますか？')){state.records=state.records.filter(x=>x.id!==target.dataset.deleteRecord);store();render()}return}
  if(target.dataset.removeRace){if(confirm('この取込レースを削除しますか？ 保存済み予想スナップショットは残ります。')){state.races=state.races.filter(x=>x.id!==target.dataset.removeRace);if(!state.races.some(x=>x.id===state.raceId))state.raceId=DEMO[10].id;store();render()}return}
