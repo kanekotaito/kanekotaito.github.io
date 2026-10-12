@@ -149,6 +149,28 @@ app.addEventListener('change',function(e){
  battleTimer=null;battleView.phase='ready';battleView.result=null;render();
 });
 app.addEventListener('click',function(e){var b=e.target.closest('button[data-act]');if(!b||b.disabled)return;var action=b.getAttribute('data-act');
+if(action==='battle-close'){
+ if(battleTimer)clearTimeout(battleTimer);battleTimer=null;
+ battleView=null;renderHome();window.scrollTo(0,0);return;
+}
+if(action==='battle-play'){
+ if(!battleView||battleView.phase==='playing')return;
+ if(!battleView.left||!battleView.right||battleView.left===battleView.right){
+  window.alert('対戦する異なる2人を選んでください。');return;
+ }
+ try{
+  var dbA=PlayerProfiles.read(localStorage,battleView.left),dbB=PlayerProfiles.read(localStorage,battleView.right);
+  var contest=PlayerProfiles.roundup(dbA,dbB);
+  battleView.phase='playing';battleView.result=null;render();
+  var left=battleView.left,right=battleView.right;
+  if(battleTimer)clearTimeout(battleTimer);
+  battleTimer=setTimeout(function(){
+   if(!battleView||battleView.phase!=='playing'||battleView.left!==left||battleView.right!==right)return;
+   battleView.phase='result';battleView.result=contest;battleTimer=null;render();
+  },1900);
+ }catch(err){window.alert('腕相撲を始められませんでした。 '+String(err.message||err));}
+ return;
+}
 if(action==='sr-open'){StudyRecords.ensure(DB,Q);recordView={tab:'review'};save();render();window.scrollTo(0,0);return;}
 if(action==='sr-close'){recordView=null;render();window.scrollTo(0,0);return;}
 if(action==='sr-tab'){recordView={tab:b.getAttribute('data-tab')||'review'};render();window.scrollTo(0,0);return;}
@@ -161,7 +183,7 @@ if(action==='sr-import'){
  var fileInput=document.createElement('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.style.display='none';document.body.appendChild(fileInput);
  fileInput.onchange=function(){var file=fileInput.files&&fileInput.files[0];if(fileInput.parentNode)fileInput.parentNode.removeChild(fileInput);if(!file)return;if(file.size>15*1024*1024){window.alert('ファイルが大きすぎます。15MB以内の記録を選んでください。');return;}
  var reader=new FileReader();reader.onload=function(){try{var imported=StudyRecords.validateRestore(String(reader.result||''));
- if(!window.confirm('現在の学習データをバックアップ内容で置き換えます。現在の記録を残したい場合は先にバックアップしてください。復元しますか？'))return;
+ if(!window.confirm('現在のプレイヤー「'+PlayerProfiles.active(localStorage).name+'」の学習記録をバックアップ内容で置き換えます。他のプレイヤーの記録は変わりません。復元しますか？'))return;
  DB=imported;StudyRecords.ensure(DB,Q);QuizStore.ensure(DB,Q);Motivation.ensure(DB);recordView=null;save();renderHome();window.scrollTo(0,0);
  window.alert('バックアップを復元しました。');}catch(err){window.alert('復元できませんでした。\n'+String(err.message||err));}};reader.onerror=function(){window.alert('ファイルを読み込めませんでした。');};reader.readAsText(file);
  };fileInput.click();return;
