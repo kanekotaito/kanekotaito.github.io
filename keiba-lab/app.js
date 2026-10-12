@@ -85,7 +85,7 @@ function store(){
  try{localStorage.setItem(KEY,JSON.stringify({v:VERSION,imported:state.races.filter(r=>r.type!=='demo'),records:state.records.slice(-800),preset:state.preset,weights:state.weights,raceId:state.raceId}));return true}catch{toast('容量上限です。JSONを保存してデータを整理してください。');return false}
 }
 function normalizeWeights(weights){const raw=Array.isArray(weights)?Object.fromEntries(KEYS.map((k,i)=>[k,weights[i]])):weights;return Object.fromEntries(KEYS.map(k=>[k,clamp(Number(raw?.[k]??0),0,100)]))}
-function setPreset(name){state.preset=name;state.weights=normalizeWeights(name==='custom'?(persisted.weights||PRESETS.balanced.weights):PRESETS[name].weights);store();render();}
+function setPreset(name){state.preset=name;state.weights=normalizeWeights(name==='custom'?state.weights:PRESETS[name].weights);store();render();}
 function currentRace(){return state.races.find(r=>r.id===state.raceId)||state.races[0]}
 function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),3500)}
 function hideOutcome(race){return Boolean(race.result)&&!state.revealed.has(race.id)}
@@ -124,7 +124,7 @@ function renderLab(){
  const racePicker='<div class="controls"><label class="field full">対象レース<select id="raceSelect">'+state.races.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(x=>'<option value="'+escapeHtml(x.id)+'" '+(r.id===x.id?'selected':'')+'>'+escapeHtml(raceLabel(x))+'</option>').join('')+'</select></label><label class="field">競馬場 / 距離<input readonly value="'+escapeHtml(r.course+' / '+r.surface+' '+r.distance+'m')+'"></label><label class="field">馬場 / 想定ペース<input readonly value="'+escapeHtml(r.going+' / '+(r.pace||'不明'))+'"></label></div><p class="hint">入力は発走前に確定した情報だけを使用してください。取込データの正確性は提供元に依存します。</p>';
  const ranking='<div class="table-top"><span>馬番</span><span>出走馬 / 騎手</span><span>勝率の大きさ</span><span>試算勝率</span><span>単勝</span></div>'+pred.rows.map((h,i)=>'<button class="horserow '+(h.id===selected.id?'selected':'')+'" data-horse="'+escapeHtml(h.id)+'" aria-label="'+escapeHtml(h.name)+' の詳細を表示"><span class="num w'+h.draw+'">'+h.number+'</span><span><span class="hn">'+escapeHtml(h.name)+'</span><small>'+escapeHtml(h.jockey)+' · '+h.age+'歳 · '+escapeHtml(h.style||'未登録')+'</small></span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,100*h.win/.5)+'%"></div></div><span class="metric">'+pct(h.win)+'</span><span class="odds">'+(h.odds?fmt(h.odds):'—')+'</span></button>').join('')+'<p class="hint">推定勝率は重み付き指数から作った未校正モデルの値です。実際の勝率を保証しません。緑バーは50%を最大幅として表示。</p>';
  const presets='<div class="modetabs">'+Object.entries(PRESETS).map(([k,v])=>'<button data-preset="'+k+'" class="'+(state.preset===k?'active':'')+'">'+v.label+'</button>').join('')+'</div><p class="hint">'+escapeHtml(PRESETS[state.preset].desc)+'</p>';
- const weights='<div class="weightlist">'+FACTORS.map(([key,label,title])=>'<label title="'+escapeHtml(title)+'" class="weightrow"><span>'+escapeHtml(label)+'</span><input type="range" min="0" max="100" step="1" data-weight="'+key+'" value="'+state.weights[key]+'" aria-label="'+escapeHtml(label)+'"><strong data-weight-label="'+key+'">'+state.weights[key]+'</strong></label>').join('')+'</div><p class="weighthelp">0は評価から除外。各重みは合計値で正規化して計算します。指標は独立とは限らないため重複評価に注意。</p><div class="btnrow"><button class="button alt" data-action="resetWeights">基準に戻す</button><button class="button ghost" data-action="saveForecast">この予想を記録</button></div>';
+ const weights='<div class="weightlist">'+FACTORS.map(([key,label,title])=>'<label title="'+escapeHtml(title)+'" class="weightrow"><span>'+escapeHtml(label)+'</span><input type="range" min="0" max="100" step="1" data-weight="'+key+'" value="'+state.weights[key]+'" aria-label="'+escapeHtml(label)+'"><strong data-weight-label="'+key+'">'+state.weights[key]+'</strong></label>').join('')+'</div><p class="weighthelp">0は評価から除外。各重みは合計値で正規化して計算します。指標は独立とは限らないため重複評価に注意。</p><label class="field full mt12">予想の理由や迷った点<textarea id="forecastNote" placeholder="例：前半が速くなると予想。外差し馬場を重視した。" rows="2"></textarea></label><div class="btnrow"><button class="button alt" data-action="resetWeights">基準に戻す</button><button class="button ghost" data-action="saveForecast">この予想を記録</button></div>';
  const kpis='<div class="detailstats"><div class="micro"><span>試算勝率</span><strong class="lime">'+pct(selected.win)+'</strong></div><div class="micro"><span>3着以内</span><strong>'+pct(selected.top3)+'</strong></div><div class="micro"><span>期待着順</span><strong>'+fmt(selected.expected)+'着</strong></div></div>';
  const factors='<div class="sectiontag">FACTOR PROFILE / 適性スコア</div>'+FACTORS.filter(x=>x[0]!=='market').map(([key,label])=>'<div class="factor"><span>'+label+'</span><div class="bar-track"><div class="bar-fill" style="width:'+selected.features[key]+'%"></div></div><strong>'+fmt(selected.features[key],0)+'</strong></div>').join('');
  const detail='<div class="detailtop"><span class="num w'+selected.draw+'">'+selected.number+'</span><div><h3>'+escapeHtml(selected.name)+'</h3><p>'+escapeHtml(selected.sex||'?')+selected.age+'歳 / '+escapeHtml(selected.jockey)+'騎手</p></div></div>'+kpis+factors+'<div class="line"></div><table class="info-table"><tr><td>父 / 母父</td><td>'+escapeHtml(selected.sire||'未登録')+' / '+escapeHtml(selected.damSire||'未登録')+'</td></tr><tr><td>厩舎</td><td>'+escapeHtml(selected.trainer||'未登録')+'</td></tr><tr><td>斤量 / 枠</td><td>'+selected.weight+'kg / '+selected.draw+'枠</td></tr><tr><td>近走</td><td>'+escapeHtml(selected.form||'未登録')+'</td></tr><tr><td>レース間隔</td><td>'+escapeHtml(selected.lastRunDays??'未登録')+' 日</td></tr><tr><td>期待倍率</td><td>'+((selected.odds&&selected.ev!==null)?fmt(selected.ev,2)+' 倍（勝率×単勝）':'オッズ未登録')+'</td></tr></table><p class="hint">期待倍率は控除率・購入タイミング・オッズ変動・推定誤差を考慮していません。</p>';
@@ -154,28 +154,34 @@ function metrics(pred,race){
  const returned=hit&&favorite.odds?favorite.odds*100:0;
  return {hit,logloss:-Math.log(winnerP),brier,returned,winningProb:winnerP,top:favorite,winner};
 }
+function outcomeFor(rec){
+ const latest=state.races.find(x=>x.id===rec.raceId);
+ const result=latest?.result||rec.raceSnapshot?.result;
+ const ids=new Set(rec.probabilities.map(x=>x.id));
+ return Array.isArray(result)&&result.length===rec.horseCount&&result.every(id=>ids.has(id))?result:null;
+}
 function historyView(){
  const records=state.records;
- const resolved=records.filter(x=>Array.isArray(x.raceSnapshot?.result)&&x.raceSnapshot.result.length);
+ const resolved=records.filter(x=>outcomeFor(x));
  const settled=resolved.map(rec=>{
- const first=rec.probabilities.find(x=>x.id===rec.raceSnapshot.result[0]);
+ const outcome=outcomeFor(rec),first=rec.probabilities.find(x=>x.id===outcome[0]);
  const pick=rec.probabilities.find(x=>x.id===rec.topId);
- return {...rec,correct:rec.topId===rec.raceSnapshot.result[0],winnerP:first?.win||0,returned:rec.topId===rec.raceSnapshot.result[0]?(pick?.odds||0)*100:0};
+ return {...rec,correct:rec.topId===outcome[0],winnerP:first?.win||0,returned:rec.topId===outcome[0]?(pick?.odds||0)*100:0};
  });
  const eligible=settled.filter(x=>!x.retrospective&&!x.isDemo);
  const hit=eligible.filter(x=>x.correct).length;
  const kpi='<div class="chartgrid"><div class="kpi"><span>保存した予想</span><strong>'+records.length+'</strong><small>ブラウザー保存</small></div><div class="kpi"><span>事前の実戦記録</span><strong>'+eligible.length+'</strong><small>デモ・事後作成を除外</small></div><div class="kpi"><span>1着的中率</span><strong>'+(eligible.length?pct(hit/eligible.length):'—')+'</strong><small>実戦記録のみ</small></div><div class="kpi"><span>仮想単勝回収率</span><strong>'+(eligible.length?pct(sum(eligible.map(x=>x.returned))/(eligible.length*100)):'—')+'</strong><small>1レース100円と仮定</small></div></div>';
  const list=records.length?records.map(rec=>{
- const valid=Array.isArray(rec.raceSnapshot?.result)&&rec.raceSnapshot.result.length;
- const winner=valid?rec.raceSnapshot.result[0]:null, pick=rec.probabilities.find(x=>x.id===rec.topId), winnerName=rec.probabilities.find(x=>x.id===winner)?.name;
+ const outcome=outcomeFor(rec),valid=Boolean(outcome);
+ const winner=valid?outcome[0]:null, pick=rec.probabilities.find(x=>x.id===rec.topId), winnerName=rec.probabilities.find(x=>x.id===winner)?.name;
  return '<div class="record"><div class="recordtitle"><strong>'+escapeHtml(rec.raceName)+'</strong><span class="badge '+(rec.isDemo?'orange':'blue')+'">'+(rec.isDemo?'架空':'取込データ')+'</span></div><p>'+escapeHtml(rec.raceDate)+' · 予想保存 '+escapeHtml((rec.createdAt||'').replace('T',' ').slice(0,16))+' UTC · '+escapeHtml(PRESETS[rec.preset]?.label||'カスタム')+'</p><div class="grid2"><div><span class="tiny">予想本命</span><h4>'+escapeHtml(rec.topName)+' <span class="mono">'+pct(pick?.win||0)+'</span></h4></div><div><span class="tiny">判定</span><h4>'+(valid?(winner===rec.topId?'<span style="color:var(--lime)">1着的中</span>':'不的中 / 1着 '+escapeHtml(winnerName||'?')):'結果未登録')+'</h4></div></div>'+(rec.retrospective?'<span class="badge orange">事後練習（実戦統計には含めない）</span>':'')+(rec.note?'<p>メモ：'+escapeHtml(rec.note)+'</p>':'')+'<div class="btnrow"><button class="smallbtn" data-record="'+escapeHtml(rec.id)+'">予想の詳細</button><button class="smallbtn" data-delete-record="'+escapeHtml(rec.id)+'">削除</button></div></div>';
  }).join(''):'<div class="empty"><strong>まだ予想記録がありません</strong>「予想ラボ」で勝率を計算してから、仮説を保存してみましょう。<div class="btnrow" style="justify-content:center"><button class="button" data-goto="lab">予想を始める</button></div></div>';
  return intro('予想の足跡を残す。','結果を見る前の予想を保存し、考え方と実際の着順を後から比較します。','PREDICTION JOURNAL')+kpi+card('記録一覧',list,'<small>'+records.length+' predictions</small>')+'<p class="hint">保存時点の馬・オッズ・結果・予想重みをスナップショット化。過去レースやデモの事後学習は、実戦成績から分離します。</p>';
 }
 function recordDetail(rec){
  const r=rec.raceSnapshot, rows=rec.probabilities.slice().sort((a,b)=>b.win-a.win);
- const win=r?.result?.[0];
- const body='<p class="paneltext">予想保存: '+escapeHtml(rec.createdAt)+' / モデル: '+escapeHtml(rec.modelVersion||'旧形式')+'</p><div class="tablewrap"><table class="smalltable"><thead><tr><th>馬番</th><th>馬名</th><th>保存時点の勝率</th><th>単勝</th><th>結果</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+x.number+'</td><td>'+escapeHtml(x.name)+'</td><td class="numtd">'+pct(x.win)+'</td><td>'+fmt(Number(x.odds))+'</td><td>'+(r?.result?((r.result.indexOf(x.id)+1)||'—')+'着':'未登録')+'</td></tr>').join('')+'</tbody></table></div><div class="line"></div><div class="sectiontag">保存された重み</div><div class="flags">'+FACTORS.map(([k,n])=>'<span>'+n+' '+(rec.weights[k]||0)+'</span>').join('')+'</div>'+(rec.note?'<p class="paneltext">予想メモ: '+escapeHtml(rec.note)+'</p>':'')+'<div class="btnrow"><button class="button alt" data-goto="history">← 記録一覧に戻る</button></div>';
+ const result=outcomeFor(rec);
+ const body='<p class="paneltext">予想保存: '+escapeHtml(rec.createdAt)+' / モデル: '+escapeHtml(rec.modelVersion||'旧形式')+'</p><div class="tablewrap"><table class="smalltable"><thead><tr><th>馬番</th><th>馬名</th><th>保存時点の勝率</th><th>単勝</th><th>結果</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+x.number+'</td><td>'+escapeHtml(x.name)+'</td><td class="numtd">'+pct(x.win)+'</td><td>'+fmt(Number(x.odds))+'</td><td>'+(result?((result.indexOf(x.id)+1)||'—')+'着':'未登録')+'</td></tr>').join('')+'</tbody></table></div><div class="line"></div><div class="sectiontag">保存された重み</div><div class="flags">'+FACTORS.map(([k,n])=>'<span>'+n+' '+(rec.weights[k]||0)+'</span>').join('')+'</div>'+(rec.note?'<p class="paneltext">予想メモ: '+escapeHtml(rec.note)+'</p>':'')+'<div class="btnrow"><button class="button alt" data-goto="history">← 記録一覧に戻る</button></div>';
  return intro('予想を検証する。',rec.raceName+' / 保存された確率と重みは変更しません。','SNAPSHOT / IMMUTABLE RECORD')+card('保存時点の予想',body);
 }
 function benchmark(){
@@ -224,7 +230,7 @@ function render(){
 function go(view){state.view=view;render();window.scrollTo({top:0,behavior:'instant'})}
 function showRecord(id){const rec=state.records.find(x=>x.id===id);if(!rec)return;state.view='record';$('#viewName').textContent='予想記録 / 詳細';$('#main').innerHTML=recordDetail(rec);$$('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.view==='history'));window.scrollTo(0,0)}
 function download(name,data,type='application/json;charset=utf-8'){const blob=new Blob([data],{type});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}
-const CSV_HEADERS=['race_id','date','race_name','course','surface','distance','going','weather','pace','as_of','horse_id','number','horse_name','age','sex','draw','weight','jockey','trainer','sire','dam_sire','style','form_text','last_run_days','odds','result_position',...KEYS.filter(k=>k!=='market')];
+const CSV_HEADERS=['race_id','date','race_name','course','surface','distance','going','weather','pace','as_of','class_grade','track_bias_inside','track_bias_outside','horse_id','number','horse_name','age','sex','draw','weight','jockey','trainer','sire','dam_sire','style','form_text','last_run_days','odds','result_position','past_runs_json','jockey_stats_json','trainer_stats_json','pedigree_stats_json','training_score',...KEYS.filter(k=>k!=='market')];
 const csvEscape=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
 function csvTemplate(){
  const r=DEMO[10],horses=r.horses.slice(0,3);
@@ -251,10 +257,11 @@ function convertCsv(txt){
  const lines=csvParse(txt), groups=new Map();
  for(const item of lines){
   const id=String(item.race_id).trim();if(!id)throw Error('race_id がありません');
-  if(!groups.has(id))groups.set(id,{id,date:item.date,name:item.race_name||id,course:item.course||'不明',surface:item.surface||'芝',distance:Number(item.distance)||1600,going:item.going||'良',weather:item.weather||'',pace:item.pace||'未設定',asOf:item.as_of||'',source:'ユーザーのCSV取込',horses:[],result:[],type:'imported'});
+  if(!groups.has(id))groups.set(id,{id,date:item.date,name:item.race_name||id,course:item.course||'不明',surface:item.surface||'芝',distance:Number(item.distance)||1600,going:item.going||'良',weather:item.weather||'',pace:item.pace||'未設定',asOf:item.as_of||'',classGrade:item.class_grade?Number(item.class_grade):null,trackBias:{inside:item.track_bias_inside?Number(item.track_bias_inside):null,outside:item.track_bias_outside?Number(item.track_bias_outside):null},source:'ユーザーのCSV取込',horses:[],result:[],type:'imported'});
   const r=groups.get(id), factors={};
   for(const k of KEYS.filter(k=>k!=='market'))if(item[k]!==''&&item[k]!==undefined)factors[k]=Number(item[k]);
-  const h={id:item.horse_id,number:Number(item.number),name:item.horse_name,age:Number(item.age)||0,sex:item.sex||'',draw:Number(item.draw)||Math.ceil(Number(item.number)/2),weight:Number(item.weight)||0,jockey:item.jockey||'',trainer:item.trainer||'',sire:item.sire||'',damSire:item.dam_sire||'',style:item.style||'',form:item.form_text||'',lastRunDays:item.last_run_days?Number(item.last_run_days):null,odds:item.odds?Number(item.odds):null,factors};
+  const parseCell=k=>{if(!item[k])return undefined;try{return JSON.parse(item[k])}catch{throw Error(k+' に正しいJSONを入力してください')}};
+  const h={pastRuns:parseCell('past_runs_json'),jockeyStats:parseCell('jockey_stats_json'),trainerStats:parseCell('trainer_stats_json'),pedigreeStats:parseCell('pedigree_stats_json'),trainingScore:item.training_score?Number(item.training_score):undefined,id:item.horse_id,number:Number(item.number),name:item.horse_name,age:Number(item.age)||0,sex:item.sex||'',draw:Number(item.draw)||Math.ceil(Number(item.number)/2),weight:Number(item.weight)||0,jockey:item.jockey||'',trainer:item.trainer||'',sire:item.sire||'',damSire:item.dam_sire||'',style:item.style||'',form:item.form_text||'',lastRunDays:item.last_run_days?Number(item.last_run_days):null,odds:item.odds?Number(item.odds):null,factors};
   r.horses.push(h);
   if(item.result_position!=='')r.result.push({id:h.id,position:Number(item.result_position)});
  }
@@ -282,7 +289,7 @@ async function importFile(file){
   const text=await file.text(),obj=file.name.toLowerCase().endsWith('.csv')?convertCsv(text):JSON.parse(text);
   if(!file.name.toLowerCase().endsWith('.csv')&&obj?.app==='keiba-lab'&&Array.isArray(obj.races)&&Array.isArray(obj.records)){
    const incoming=obj.races;if(!incoming.every(validateRace))throw Error('バックアップ内のレース形式が不正です');
-   incoming.forEach(r=>upsert(cleanRace(r)));
+   incoming.forEach(r=>upsert(window.KEIBA_FEATURES.enrichRace(cleanRace(r))));
    state.records=[...obj.records.filter(x=>x&&x.id&&x.raceSnapshot&&Array.isArray(x.probabilities)),...state.records].filter((x,i,a)=>a.findIndex(y=>y.id===x.id)===i).slice(0,800);
    state.weights=normalizeWeights(obj.weights||state.weights);
    store();go('data');toast(incoming.length+'件のレースと予想記録を復元しました');return;
@@ -290,7 +297,7 @@ async function importFile(file){
   const list=Array.isArray(obj)?obj:Array.isArray(obj.races)?obj.races:[obj];
   if(!list.length||list.length>300)throw Error('1回の取込は1〜300レースまでです');
   if(!list.every(validateRace))throw Error('レースの形式が正しくありません。DATA_FORMAT.mdを確認してください。');
-  list.forEach(r=>upsert(cleanRace(r)));store();go('data');toast(list.length+'レースを取り込みました');
+  list.forEach(r=>upsert(window.KEIBA_FEATURES.enrichRace(cleanRace(r))));store();go('data');toast(list.length+'レースを取り込みました');
  }catch(e){toast('取込できません: '+String(e.message||e).slice(0,130))}
 }
 function upsert(r){if(r.id.startsWith('demo-'))r.id='import-'+r.id;const i=state.races.findIndex(x=>x.id===r.id);if(i>=0){if(state.races[i].type==='demo')throw Error('デモレースは上書きできません');state.races[i]=r}else state.races.push(r)}
