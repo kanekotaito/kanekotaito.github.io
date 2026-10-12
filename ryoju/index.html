@@ -41,7 +41,17 @@ function mmss(t){return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60
 function countKeys(o){return Object.keys(o||{}).length;}
 function sessionSummary(s){return s.mode==='sprint'?'3問チャレンジ':s.mode==='focus'?'5問特訓':s.mode==='exam'?'本番模試 50問':s.mode==='pack'?'🔓 PACK '+s.kind+'　50問':s.mode==='review'?'間違い復習':s.kind==='法令'?'法令だけ':s.kind==='取扱い'?'取扱いだけ':s.kind&&s.kind.charAt(0)==='S'?Q.find(function(x){return x.section===s.kind;}).topic:s.mode==='full'?'解放済み全問演習':'10問トレーニング';}
 function notice(){return memOK?'':'<div class="warning">このブラウザーでは学習記録を保存できません。解答中は画面を閉じないでください。</div>';}
-function finishSession(timeUp){var s=DB.session,priorMuscleStage=Muscle.stage(DB);if(!s||s.finished)return;s.finished=true;s.timeUp=!!timeUp;s.finishedAt=Date.now();var ids=s.order;var correct=0;ids.forEach(function(id){if(s.answers[id]===idToQ(id).a)correct++;});DB.history.unshift({date:Date.now(),mode:s.mode,total:ids.length,correct:correct});DB.history=DB.history.slice(0,20);if(s.mode==='exam'){DB.fxTotalCorrect+=correct;DB.fxXp+=10*correct;s.coinsEarned=QuizStore.examResult(DB,s,Q);}else{s.coinsEarned=s.coinsEarned||{};QuizStore.settle(DB,Q);}save();render();if(s.mode==='exam'&&correct>=45){window.requestAnimationFrame(function(){Reward.tone(20,DB.fxSound);Muscle.celebrate(DB,{exam:true,evolved:Muscle.stage(DB)>priorMuscleStage});});}else if(s.mode!=='exam'&&correct===ids.length&&ids.length>=10){window.requestAnimationFrame(function(){Muscle.celebrate(DB,{streak:correct,big:true,evolved:Muscle.stage(DB)>priorMuscleStage});});}}
+function finishSession(timeUp){var s=DB.session,priorMuscleStage=Muscle.stage(DB);if(!s||s.finished)return;s.finished=true;s.timeUp=!!timeUp;s.finishedAt=Date.now();var ids=s.order;var correct=0;ids.forEach(function(id){if(s.answers[id]===idToQ(id).a)correct++;});DB.history.unshift({date:Date.now(),mode:s.mode,total:ids.length,correct:correct});DB.history=DB.history.slice(0,20);if(s.mode==='exam'){
+ var beforeExam={};s.order.forEach(function(id){beforeExam[id]={mastered:!!(DB.economy&&DB.economy.mastered&&DB.economy.mastered[id]),missed:!!DB.miss[id]};});
+ DB.fxTotalCorrect+=correct;DB.fxXp+=10*correct;s.coinsEarned=QuizStore.examResult(DB,s,Q);
+ s.dailyNewAwards=[];
+ s.order.forEach(function(id){
+  if(!s.answers[id])return;
+  var ok=s.answers[id]===idToQ(id).a,old=beforeExam[id];
+  var item=Motivation.record(DB,{id:id,correct:ok,wasWrong:old.missed,newMastered:!old.mastered&&ok});
+  (item.newAwards||[]).forEach(function(a){s.dailyNewAwards.push(a);});
+ });
+}else{s.coinsEarned=s.coinsEarned||{};QuizStore.settle(DB,Q);}save();render();if(s.mode==='exam'&&correct>=45){window.requestAnimationFrame(function(){Reward.tone(20,DB.fxSound);Muscle.celebrate(DB,{exam:true,evolved:Muscle.stage(DB)>priorMuscleStage});});}else if(s.mode!=='exam'&&correct===ids.length&&ids.length>=10){window.requestAnimationFrame(function(){Muscle.celebrate(DB,{streak:correct,big:true,evolved:Muscle.stage(DB)>priorMuscleStage});});}}
 function questIDs(mode){
  var eligible=mix(Q.filter(function(q){return QuizStore.available(DB,q);}));
  var wrong=eligible.filter(function(q){return !!DB.miss[q.id];}),fresh=eligible.filter(function(q){return !DB.miss[q.id]&&!(DB.economy&&DB.economy.mastered&&DB.economy.mastered[q.id]);});
