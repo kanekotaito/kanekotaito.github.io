@@ -1,6 +1,6 @@
 # KEIBA LAB | 競馬予想研究所
 
-**公開用の静的Webアプリ**。React・サーバー・APIキー不要。GitHub Pagesの \`/keiba-lab/\` 以下で動き、既存サイトのトップは変更しません。
+**公開用の静的Webアプリ**。React・サーバー・APIキー不要。GitHub Pagesの `/keiba-lab/` 以下で動き、既存サイトのトップは変更しません。
 
 ## 何ができるか
 
@@ -14,7 +14,7 @@
 
 ## 使い方
 
-1. \`index.html\` を開く（またはGitHub Pagesの公開URL）。
+1. `index.html` を開く（またはGitHub Pagesの公開URL）。
 2. デモのレースを選んで、予想モデルを比較。
 3. 右側の重みを動かして「この予想を記録」。
 4. 結果が登録されていれば「結果を表示」で答え合わせ。
@@ -29,16 +29,16 @@
 
 ## ソースコード
 
-- \`index.html\`: UIのHTML
-- \`styles.css\`: レスポンシブUI
-- \`feature-engine.js\`: 過去走から事前特徴量の簡易生成
-- \`app.js\`: 予測計算・モデル比較・取込・保存・評価
-- \`tests/smoke.test.cjs\`: Node.jsによる基本テスト
+- `index.html`: UIのHTML
+- `styles.css`: レスポンシブUI
+- `feature-engine.js`: 過去走から事前特徴量の簡易生成
+- `app.js`: 予測計算・モデル比較・取込・保存・評価
+- `tests/smoke.test.cjs`: Node.jsによる基本テスト
 
 ### 開発時
 
-\`\`\`bash
+```bash
 node keiba-lab/tests/smoke.test.cjs
-\`\`\`
+```
 
-GitHub Pagesでの表示は \`https://kanekotaito.github.io/keiba-lab/\` を想定。Pagesがリポジトリのmainブランチから配信されている必要があります。
+GitHub Pagesでの表示は `https://kanekotaito.github.io/keiba-lab/` を想定。Pagesがリポジトリのmainブランチから配信されている必要があります。
