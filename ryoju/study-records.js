@@ -21,6 +21,14 @@ function ensure(db,questions){
    r.byId[id]=key;
   });
  }
+ if(!r.legacyMissSeeded&&questions){
+   var knownWrong={};
+   r.sessions.forEach(function(s){
+     (s.answers||[]).forEach(function(a){if(a.given!==a.correct)knownWrong[a.id]=true;});
+   });
+   r.legacyWrongIds=Object.keys(db.miss||{}).filter(function(id){return !!db.miss[id]&&!knownWrong[id];});
+   r.legacyMissSeeded=true;
+ }
  if(!r.migrated){
   (Array.isArray(db.history)?db.history:[]).forEach(function(item,i){
    var id="legacy-"+(item.date||0)+"-"+i;
@@ -76,6 +84,14 @@ function revision(db){
   if(!group[p])group[p]={page:p,wrong:0,ids:{},topics:{},at:0};
   var z=group[p];z.wrong++;z.ids[q.id]=true;z.topics[q.topic||q.kind||"不明"]=true;z.at=Math.max(z.at,a.at||0);
  });});
+ // Historical pending mistakes from old releases remain part of the archive
+ // even if the user later resets the active learning progress.
+ (r.legacyWrongIds||[]).forEach(function(id){
+  var key=r.byId&&r.byId[id],q=key&&r.questions[key];if(!q)return;
+  var p=q.bookPage||"ページ未確認";
+  if(!group[p])group[p]={page:p,wrong:0,ids:{},topics:{},at:0};
+  group[p].wrong++;group[p].ids[id]=true;group[p].topics[q.topic||q.kind||"不明"]=true;
+ });
  // Include still-unresolved mistakes from prior versions without invented choices.
  Object.keys(db.miss||{}).forEach(function(id){
   if(!db.miss[id])return;
@@ -124,11 +140,13 @@ function render(db,opts){
    var oldMistakes=entries(db,"wrong",opts.page);
    oldMistakes.slice(0,100).forEach(function(x){out+=questionHTML(x);});
    var pastIds={};oldMistakes.forEach(function(x){pastIds[x.q.id]=true;});
-   Object.keys(db.miss||{}).forEach(function(id){
-    if(!db.miss[id]||pastIds[id])return;
+   var historicalIds=Array.from(new Set((r.legacyWrongIds||[]).concat(Object.keys(db.miss||{}))));
+   historicalIds.forEach(function(id){
+    if(!db.miss[id]&&(r.legacyWrongIds||[]).indexOf(id)<0)return;
+    if(pastIds[id])return;
     var key=r.byId&&r.byId[id],q=key&&r.questions[key];
     if(!q||q.bookPage!==opts.page)return;
-    out+='<article class="sr-question wrong"><div class="sr-question-head"><span>問題 '+q.id+'　'+esc(q.topic)+'</span><b>📖 復習待ち</b></div>'+
+    out+='<article class="sr-question wrong"><div class="sr-question-head"><span>問題 '+q.id+'　'+esc(q.topic)+'</span><b>'+(db.miss[id]?"📖 復習待ち":"旧版の誤答履歴")+'</b></div>'+
       '<p>'+esc(q.q)+'</p><div class="sr-answer-line">旧版から引き継いだ復習待ち問題。<strong>当時の回答は未保存</strong>　正答 '+esc(q.a)+'</div>'+
       '<details><summary>解説と復習ページを見る</summary><div class="sr-explain"><p>'+esc(q.why)+'</p><b>📖 '+esc(q.bookPage)+'</b></div></details></article>';
    });
