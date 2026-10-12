@@ -70,7 +70,7 @@ function medals(db){
  var mastered=db&&db.economy&&db.economy.mastered||{},c=Object.keys(mastered).filter(function(k){return !!mastered[k];}).length;
  return MEDALS.map(function(x){return {at:x.at,name:x.name,icon:x.icon,earned:c>=x.at};});
 }
-function home(db){
+function home(db,part){
  var m=ensure(db),progress=Math.min(100,Math.round(100*m.answered/m.goal)),completed=m.answered>=m.goal;
  var html='<section class="mot-hero" aria-label="今日の3問チャレンジ"><div class="mot-tag"><span>DAILY QUEST</span><span class="mot-day">'+escapeHtml(m.day)+'</span></div>'+
  '<div class="mot-hero-main"><div><h2>'+(completed?'🏆 今日の目標クリア！':'⚡ まずは3問だけ！')+'</h2><p>'+(completed?'今日の成果は残っています。続けるか、ここで終えるかは自由。':'数分だけ挑戦。マッチョも勉強も、始めると動き出す。')+'</p></div><div class="mot-ring" style="--mot-progress:'+progress+'%"><div><strong>'+Math.min(m.answered,m.goal)+'</strong><small>/ '+m.goal+'問</small></div></div></div>'+
@@ -79,6 +79,7 @@ function home(db){
  '<button class="mot-review-btn" type="button" data-act="start" data-mode="focus">🎯 おまかせ5問特訓</button></div>'+
  '<div class="mot-goal-chooser"><span>'+(m.answered?'今日の目標（回答開始後は固定）':'今日の目標')+'</span>'+
  [3,5,10].map(function(n){return '<button type="button" data-act="mot-goal" data-goal="'+n+'" aria-pressed="'+(m.goal===n)+'" '+(m.answered?'disabled':'')+' class="'+(m.goal===n?'active':'')+'">'+n+'問</button>';}).join('')+'</div></section>';
+ if(part==='hero')return html;html=part==='rest'?'':html;
  html+='<section class="mot-quests"><div class="mot-section-head"><h3>🎖️ 今日のミッション</h3><span>5つの小さな達成</span></div><div class="mot-quests-grid">';
  questStats(db).forEach(function(q){
   html+='<div class="mot-quest '+(q.done?'mot-complete':'')+'"><div class="mot-quest-icon">'+q.icon+'</div><div class="mot-quest-copy"><strong>'+escapeHtml(q.name)+'</strong><span>'+escapeHtml(q.detail)+'</span><div class="mot-quest-meter"><span style="width:'+q.percent+'%"></span></div></div><div class="mot-quest-end">'+(q.done?'✓ GET':q.value+'/'+q.target)+'<small>+'+q.xp+' XP</small></div></div>';
