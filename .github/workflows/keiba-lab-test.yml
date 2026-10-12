@@ -1,0 +1,24 @@
+name: KEIBA LAB smoke tests
+on:
+  push:
+    paths:
+      - "keiba-lab/**"
+      - ".github/workflows/keiba-lab-test.yml"
+  pull_request:
+    paths:
+      - "keiba-lab/**"
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify app syntax
+        run: |
+          node --check keiba-lab/app.js
+          node --check keiba-lab/feature-engine.js
+      - name: Run smoke tests
+        run: node keiba-lab/tests/smoke.test.cjs
