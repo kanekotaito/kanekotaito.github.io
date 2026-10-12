@@ -93,6 +93,61 @@ var groups={};wrong.forEach(function(w){var k=w.q.bookPage; if(!groups[k])groups
 wrong.forEach(function(row){out+='<div class="review-row"><div class="wrong-num">ID '+row.q.id+' ｜ あなた '+esc(row.v)+' ｜ 正解 '+row.q.a+'</div><h4>'+esc(row.q.q)+'</h4><p><b>解説：</b>'+esc(row.q.why)+'</p><p><b>ひっかけ：</b>'+esc(row.q.trap)+'</p></div>';});out+='</section>'+(s.mode==='sprint'||s.mode==='focus'?Motivation.result(DB,s):'')+footer();app.innerHTML=out;}
 function footer(){return '<footer class="footer">参考：警察庁「<a href="https://www.npa.go.jp/laws/notification/seian/hoan/hoantsutatu2/R071128_jyu_kousanojishi.pdf" rel="noopener noreferrer" target="_blank">猟銃等又はクロスボウ講習会における考査の運用要領</a>」（令和7年11月28日）、別添1・別添3。本アプリは警察庁の公式アプリではありません。<br>法令確認：<a href="https://laws.e-gov.go.jp/law/333AC0000000006" target="_blank" rel="noopener noreferrer">e-Gov 銃砲刀剣類所持等取締法</a>・<a href="https://laws.e-gov.go.jp/law/333CO0000000033" target="_blank" rel="noopener noreferrer">同施行令</a>（2026年10月確認）。問題文・解説は自主学習用の独自編集で、追加400問は公式例題にある知識を組み合わせた応用問題です。公式問題の丸写しではありません。読本本文は未提供のため復習ページは暫定です。インターネット接続は初回のアプリ表示時に必要です。<br>記録は使用中のブラウザー内にのみ保存されます。'+(memOK?'':'<b>この環境では記録の永続保存は利用できません。</b>')+'</footer>';}
 function render(){if(battleView){app.innerHTML=PlayerProfiles.battle(localStorage,battleView,battleView.phase,battleView.result);return;}if(recordView){app.innerHTML=StudyRecords.render(DB,recordView);return;}var s=DB.session;if(s&&!s.finished&&s.mode==='exam'&&remaining(s)<=0){finishSession(true);return;}if(!s){renderHome();return;}if(s.finished){renderResult();return;}renderQuiz();}
+
+function switchPlayer(id){
+ if(!id||PlayerProfiles.active(localStorage).id===id)return;
+ if(DB.session&&!DB.session.finished)StudyRecords.pause(DB,Q);
+ save();
+ if(!memOK){window.alert('現在の学習記録が保存できません。切替を中止しました。');return;}
+ try{
+   var next=PlayerProfiles.read(localStorage,id);
+   PlayerProfiles.switchTo(localStorage,id);
+   DB=next;QuizStore.ensure(DB,Q);Motivation.ensure(DB);StudyRecords.ensure(DB,Q);
+   recordView=null;battleView=null;
+   if(battleTimer)clearTimeout(battleTimer);battleTimer=null;
+   save();renderHome();window.scrollTo(0,0);
+ }catch(err){window.alert('切替に失敗しました。 '+String(err.message||err));}
+}
+function playerCommand(action,id){
+ if(action==='switch'){switchPlayer(id);return;}
+ if(action==='create'){
+  var name=window.prompt('新しいプレイヤー名を入力してください（1〜16文字）。');
+  if(name===null)return;
+  try{
+   var p=PlayerProfiles.create(localStorage,name);
+   if(window.confirm('「'+p.name+'」で今すぐ始めますか？'))switchPlayer(p.id);
+   else renderHome();
+  }catch(err){window.alert(String(err.message||err));}
+  return;
+ }
+ if(action==='rename'){
+  var person=PlayerProfiles.active(localStorage),name=window.prompt('プレイヤー名を変更',person.name);
+  if(name===null)return;
+  try{PlayerProfiles.rename(localStorage,name);renderHome();}
+  catch(err){window.alert(String(err.message||err));}
+  return;
+ }
+ if(action==='battle'){
+  recordView=null;
+  var list=PlayerProfiles.users(localStorage),current=PlayerProfiles.active(localStorage);
+  battleView={left:current.id,right:(list.find(function(p){return p.id!==current.id;})||{}).id||null,phase:'ready',result:null};
+  render();window.scrollTo(0,0);
+ }
+}
+app.addEventListener('click',function(e){
+ var actionButton=e.target.closest('button[data-profile-action]');
+ if(!actionButton||actionButton.disabled)return;
+ playerCommand(actionButton.getAttribute('data-profile-action'),actionButton.getAttribute('data-profile-id'));
+});
+app.addEventListener('change',function(e){
+ var b=e.target.closest&&e.target.closest('select[data-battle-select]');
+ if(!b||!battleView)return;
+ var side=b.getAttribute('data-battle-select');
+ if(side!=='left'&&side!=='right')return;
+ battleView[side]=b.value;
+ if(battleTimer)clearTimeout(battleTimer);
+ battleTimer=null;battleView.phase='ready';battleView.result=null;render();
+});
 app.addEventListener('click',function(e){var b=e.target.closest('button[data-act]');if(!b||b.disabled)return;var action=b.getAttribute('data-act');
 if(action==='sr-open'){StudyRecords.ensure(DB,Q);recordView={tab:'review'};save();render();window.scrollTo(0,0);return;}
 if(action==='sr-close'){recordView=null;render();window.scrollTo(0,0);return;}
