@@ -6,7 +6,7 @@
 var M=window.Muscle,Reward=window.Reward;
 if(!M||!Reward)return;
 var previousCelebrate=M.celebrate;
-var audio=null,lastSoundTime=0;
+var audio=null,lastSoundTime=-1;
 function reducedMotion(){
  try{return !!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);}
  catch(e){return false;}
@@ -27,8 +27,10 @@ function reworkScene(db,opt){
  if(!scene)return;
  var stat=M.stats(db),streak=Math.max(0,Number(opt.streak)||0);
  var big=!!opt.evolved||!!opt.exam||!!opt.pack||!!opt.big||streak>=5;
+ var milestones=[3,5,10,15,20,30,50,75,100,150,200];
+ var extended=!!opt.evolved||!!opt.exam||!!opt.pack||milestones.indexOf(streak)>=0;
  scene.classList.add("reward-smooth",big?"reward-grand":"reward-regular");
- scene.style.setProperty("--reward-runtime",(big?2920:2200)+"ms");
+ scene.style.setProperty("--reward-runtime",(extended?3000:2250)+"ms");
  // Preserve existing unlocked themes and the clay wrestler, but replace
  // the old heavy confetti with lighter, composited light particles.
  var existing=scene.querySelectorAll(".mqv-piece");
@@ -47,7 +49,7 @@ function reworkScene(db,opt){
   var reward=el("div","reward-smooth-gain");
   if(opt.pack)reward.textContent="🎁 新問題への扉 OPEN";
   else if(opt.exam)reward.textContent="🏅 GREAT SCORE";
-  else reward.textContent="+"+Reward.bonus(streak)+" XP  ✦  筋肉 +0.5 POWER";
+  else reward.textContent="+"+Reward.bonus(streak)+" XP  ✦  筋肉が成長！";
   reward.setAttribute("aria-hidden","true");
   var label=content.querySelector(".mqv-caption");
   if(label&&label.nextSibling)content.insertBefore(reward,label.nextSibling);
@@ -101,23 +103,24 @@ function softTone(streak,enabled){
   if(audio.state==="suspended"&&audio.resume)audio.resume().catch(function(){});
   var now=audio.currentTime;
   // Prevent accidental double triggers within one animation frame.
-  if(now-lastSoundTime<.09)return;lastSoundTime=now;
+  if(lastSoundTime>=0&&now-lastSoundTime<.09)return;lastSoundTime=now;
   var strong=Number(streak)>=5;
   var frequencies=strong?[523.25,659.25,783.99,1046.50]:[659.25,783.99,1046.50];
   var master=audio.createGain();
   master.gain.value=0.38;master.connect(audio.destination);
   for(var i=0;i<frequencies.length;i++){
-   var start=now+.012+i*(strong?.075:.085);
+   var start=now+.012+i*(strong ? .075 : .085);
    var oscillator=audio.createOscillator();
    var envelope=audio.createGain();
    oscillator.type=i===frequencies.length-1?"sine":"triangle";
    oscillator.frequency.setValueAtTime(frequencies[i],start);
    oscillator.frequency.exponentialRampToValueAtTime(frequencies[i]*1.006,start+.20);
    envelope.gain.setValueAtTime(.0001,start);
-   envelope.gain.linearRampToValueAtTime(strong?.075:.061,start+.033);
+   envelope.gain.linearRampToValueAtTime(strong ? .075 : .061,start+.033);
    envelope.gain.exponentialRampToValueAtTime(.0001,start+.35);
    oscillator.connect(envelope);envelope.connect(master);
    oscillator.start(start);oscillator.stop(start+.36);
+   oscillator.onended=function(){try{this.disconnect();}catch(e){}};
   }
  }catch(err){ /* Audio is optional and should never interrupt answering. */ }
 }
