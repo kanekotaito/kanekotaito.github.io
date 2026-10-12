@@ -120,6 +120,28 @@ function playerCommand(action,id){
   }catch(err){window.alert(String(err.message||err));}
   return;
  }
+ if(action==='delete'){
+  var person=PlayerProfiles.users(localStorage).find(function(p){return p.id===id;});
+  if(!person){window.alert('プレイヤーが見つかりません。');return;}
+  if(PlayerProfiles.users(localStorage).length<=1){window.alert('最後のプレイヤーは削除できません。');return;}
+  if(!window.confirm('「'+person.name+'」を削除しますか？ この端末に保存された学習記録・筋肉・コインも消えます。先に記録をバックアップしてください。'))return;
+  if(!window.confirm('最終確認：「'+person.name+'」のデータを削除します。この操作は元に戻せません。'))return;
+  try{
+   var deletingCurrent=PlayerProfiles.active(localStorage).id===id;
+   // Save only the *other* active profile before removing a player.
+   if(!deletingCurrent)save();
+   if(!memOK)throw new Error('現在の学習記録を保存できません。削除を中止しました。');
+   var deletion=PlayerProfiles.remove(localStorage,id);
+   if(deletingCurrent){
+    DB=PlayerProfiles.read(localStorage,deletion.active);
+    QuizStore.ensure(DB,Q);Motivation.ensure(DB);StudyRecords.ensure(DB,Q);
+   }
+   recordView=null;battleView=null;if(battleTimer)clearTimeout(battleTimer);battleTimer=null;
+   save();renderHome();window.scrollTo(0,0);
+   window.alert('「'+deletion.name+'」を削除しました。');
+  }catch(err){window.alert('削除できませんでした。'+String(err.message||err));}
+  return;
+ }
  if(action==='rename'){
   var person=PlayerProfiles.active(localStorage),name=window.prompt('プレイヤー名を変更',person.name);
   if(name===null)return;
