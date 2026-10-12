@@ -11,6 +11,16 @@ function ensure(db,questions){
  var r=db.studyRecords;
  if(!Array.isArray(r.sessions))r.sessions=[];
  if(!r.questions||typeof r.questions!=="object")r.questions={};
+ if(!r.byId||typeof r.byId!=="object")r.byId={};
+ // Previous releases saved IDs of wrong questions but not the chosen answers.
+ if(questions&&db.miss){
+  Object.keys(db.miss).forEach(function(id){
+   if(!db.miss[id])return;
+   var q=questions[Number(id)-1];if(!q)return;
+   var key=hash(q);if(!r.questions[key])r.questions[key]=snapshot(q);
+   r.byId[id]=key;
+  });
+ }
  if(!r.migrated){
   (Array.isArray(db.history)?db.history:[]).forEach(function(item,i){
    var id="legacy-"+(item.date||0)+"-"+i;
@@ -39,11 +49,16 @@ function attach(db,s,qs,backfill){
 function onAnswer(db,s,id,value,q){
  if(!q||(value!=="○"&&value!=="×"))return null;
  var r=db.studyRecords||ensure(db,null),x=attach(db,s,null,false);if(!x)return null;
- var key=hash(q);if(!r.questions[key])r.questions[key]=snapshot(q);
+ var key=hash(q);if(!r.questions[key])r.questions[key]=snapshot(q);r.byId[String(id)]=key;
  id=Number(id);
  var a=x.answers.find(function(z){return z.id===id;});
  if(!a){a={id:id,key:key,given:value,correct:q.a,at:Date.now(),edits:0};x.answers.push(a);}
- else if(a.given!==value){a.key=key;a.given=value;a.correct=q.a;a.at=Date.now();a.edits=(a.edits||0)+1;}
+ else if(a.given!==value){
+  if(!Array.isArray(a.priorChoices))a.priorChoices=[];
+  a.priorChoices.push({given:a.given,at:a.at});
+  a.key=key;a.given=value;a.correct=q.a;a.at=Date.now();a.edits=(a.edits||0)+1;
+ }
+ if(x.status==="paused")x.status="active";
  x.correct=x.answers.filter(function(z){return z.given===z.correct;}).length;
  return a;
 }
@@ -61,6 +76,15 @@ function revision(db){
   if(!group[p])group[p]={page:p,wrong:0,ids:{},topics:{},at:0};
   var z=group[p];z.wrong++;z.ids[q.id]=true;z.topics[q.topic||q.kind||"不明"]=true;z.at=Math.max(z.at,a.at||0);
  });});
+ // Include still-unresolved mistakes from prior versions without invented choices.
+ Object.keys(db.miss||{}).forEach(function(id){
+  if(!db.miss[id])return;
+  var key=r.byId&&r.byId[id],q=key&&r.questions[key];
+  if(!q)return;
+  var p=q.bookPage||"ページ未確認";
+  if(!group[p])group[p]={page:p,wrong:0,ids:{},topics:{},at:0};
+  group[p].ids[id]=true;group[p].topics[q.topic||q.kind||"不明"]=true;
+ });
  return Object.values(group).map(function(z){
   z.pending=Object.keys(z.ids).filter(function(id){return !!(db.miss&&db.miss[id]);}).length;
   z.priority=z.wrong+3*z.pending;z.topics=Object.keys(z.topics).slice(0,2);return z;
@@ -97,7 +121,17 @@ function render(db,opts){
   });
   if(tab==="page"){
    out+='<h3>🔎 '+esc(opts.page||"")+' の誤答履歴</h3>';
-   entries(db,"wrong",opts.page).slice(0,100).forEach(function(x){out+=questionHTML(x);});
+   var oldMistakes=entries(db,"wrong",opts.page);
+   oldMistakes.slice(0,100).forEach(function(x){out+=questionHTML(x);});
+   var pastIds={};oldMistakes.forEach(function(x){pastIds[x.q.id]=true;});
+   Object.keys(db.miss||{}).forEach(function(id){
+    if(!db.miss[id]||pastIds[id])return;
+    var key=r.byId&&r.byId[id],q=key&&r.questions[key];
+    if(!q||q.bookPage!==opts.page)return;
+    out+='<article class="sr-question wrong"><div class="sr-question-head"><span>問題 '+q.id+'　'+esc(q.topic)+'</span><b>📖 復習待ち</b></div>'+
+      '<p>'+esc(q.q)+'</p><div class="sr-answer-line">旧版から引き継いだ復習待ち問題。<strong>当時の回答は未保存</strong>　正答 '+esc(q.a)+'</div>'+
+      '<details><summary>解説と復習ページを見る</summary><div class="sr-explain"><p>'+esc(q.why)+'</p><b>📖 '+esc(q.bookPage)+'</b></div></details></article>';
+   });
   }
  }else if(tab==="sessions"){
   out+='<h3>🏅 過去の受験・練習履歴</h3><div class="sr-filter"><button data-act="sr-filter" data-filter="all" class="'+(opts.filter!=="exam"?"active":"")+'">すべて</button><button data-act="sr-filter" data-filter="exam" class="'+(opts.filter==="exam"?"active":"")+'">模試のみ</button></div>';
