@@ -1,6 +1,6 @@
 /* v12: continuous clay bulking and chunky stop-motion growth feedback */
 .clay-puppet-image{
-  transform:translate3d(0,0,0) scale(var(--growth-x,1),var(--growth-y,1));
+  transform:translate3d(0,0,0) scale(var(--growth-x,var(--clay-grow-x,1)),var(--growth-y,var(--clay-grow-y,1)));
   transform-origin:50% 64%;
 }
 .clay-puppet.clay-grown .clay-puppet-image{
@@ -42,3 +42,14 @@
 @media(prefers-reduced-motion:reduce){
   .clay-puppet.clay-grown .clay-puppet-image,.clay-growth-result.is-growing{animation:none!important}
 }
+/* Both 360-degree layers occupy the same space; mix weight changes with each answer. */
+.clay-puppet .clay-growth-base {z-index:0;pointer-events:none}
+.clay-puppet .clay-growth-next {z-index:1;pointer-events:none}
+.clay-growth-answer{
+ display:flex;align-items:center;justify-content:space-between;gap:8px;
+ background:linear-gradient(105deg,#fff3c1,#e6ffed);
+ border:1px solid #e4bd63;color:#825723;padding:12px 13px;
+ border-radius:13px;font-size:13px;font-weight:850;margin:0 0 14px;
+}
+.clay-growth-answer strong{font-size:16px;white-space:nowrap;color:#37804b}
+.clay-growth-answer.no-gain{background:#f1f8ee;border-color:#d0e1cc;color:#557b62}
