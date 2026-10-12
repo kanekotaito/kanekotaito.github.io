@@ -108,6 +108,69 @@ function switchPlayer(id){
    save();renderHome();window.scrollTo(0,0);
  }catch(err){window.alert('切替に失敗しました。 '+String(err.message||err));}
 }
+function refreshOnline(){
+ if(!onlineView||!OnlineArena.configured())return;
+ var view=onlineView;
+ view.loading=true;view.error=null;render();
+ OnlineArena.roster().then(function(roster){
+  if(onlineView!==view)return;
+  view.roster=roster;view.loading=false;render();
+ }).catch(function(err){
+  if(onlineView!==view)return;
+  view.loading=false;view.error=String(err.message||err);
+  render();
+ });
+}
+async function actOnline(action){
+ if(!onlineView)return;
+ var view=onlineView,active=PlayerProfiles.active(localStorage);
+ if(action==='close'){
+  if(onlineTimer)clearTimeout(onlineTimer);onlineTimer=null;
+  onlineView=null;renderHome();window.scrollTo(0,0);return;
+ }
+ if(action==='refresh'){refreshOnline();return;}
+ if(action==='fight'){
+  if(view.phase==='playing')return;
+  var linked=OnlineArena.getLink(localStorage,active.id);
+  var roster=(view.roster||[]).filter(function(x){return x.id!==linked;});
+  var opp=roster.find(function(x){return x.id===view.opponentId;})||roster[0];
+  if(!opp){window.alert('対戦相手がまだ登録されていません。');return;}
+  var result=OnlineArena.match(DB,opp);
+  view.opponentId=opp.id;view.phase='playing';view.result=null;render();
+  if(onlineTimer)clearTimeout(onlineTimer);
+  onlineTimer=setTimeout(function(){
+   if(onlineView!==view||view.phase!=='playing')return;
+   view.phase='result';view.result=result;onlineTimer=null;render();
+  },1900);
+  return;
+ }
+ if(!OnlineArena.configured()){
+  view.error='オンライン接続の設定がまだ済んでいません。';render();return;
+ }
+ try{
+  if(action==='register'){
+   if(!window.confirm('「'+active.name+'」の名前・筋肉レベル・習得問題数・模試最高点・復習克服数を公開します。URLを知る誰でも閲覧・対戦できます。問題と個別の回答は公開しません。登録しますか？'))return;
+   view.loading=true;view.error=null;render();
+   await OnlineArena.register(localStorage,active.id);
+   if(onlineView!==view)return;
+   view.loading=false;
+   refreshOnline();return;
+  }
+  if(action==='publish'){
+   view.loading=true;render();
+   await OnlineArena.publish(localStorage,active.id,DB);
+   if(onlineView!==view)return;
+   view.loading=false;refreshOnline();return;
+  }
+  if(action==='unpublish'){
+   if(!window.confirm('「'+active.name+'」のオンライン公開を解除しますか？学習履歴はこのiPhoneに残ります。'))return;
+   view.loading=true;render();
+   await OnlineArena.unregister(localStorage,active.id);
+   if(onlineView!==view)return;
+   view.loading=false;refreshOnline();return;
+  }
+ }catch(err){if(onlineView===view){view.loading=false;view.error=String(err.message||err);render();}}
+}
 function playerCommand(action,id){
  if(action==='switch'){switchPlayer(id);return;}
  if(action==='create'){
@@ -173,6 +236,19 @@ app.addEventListener('click',function(e){
  var actionButton=e.target.closest('button[data-profile-action]');
  if(!actionButton||actionButton.disabled)return;
  playerCommand(actionButton.getAttribute('data-profile-action'),actionButton.getAttribute('data-profile-id'));
+});
+app.addEventListener('click',function(e){
+ var b=e.target.closest&&e.target.closest('button[data-online-action]');
+ if(!b||b.disabled)return;
+ actOnline(b.getAttribute('data-online-action'));
+});
+app.addEventListener('change',function(e){
+ var s=e.target.closest&&e.target.closest('select[data-online-select]');
+ if(!s||!onlineView)return;
+ if(s.getAttribute('data-online-select')==='opponent'){
+  onlineView.opponentId=s.value;onlineView.phase='ready';onlineView.result=null;
+  if(onlineTimer)clearTimeout(onlineTimer);onlineTimer=null;render();
+ }
 });
 app.addEventListener('change',function(e){
  var b=e.target.closest&&e.target.closest('select[data-battle-select]');
