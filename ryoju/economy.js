@@ -53,7 +53,7 @@ function settle(db,questions){
  var e=ensure(db,questions),reward=0;
  for(var ids=packIds(questions),j=0;j<ids.length;j++){var p=ids[j];if(!own(e,p)||e.cleared[p])continue;
   var a=progress(db,questions,p);
-  if(a.total>0&&a.tried===a.total&&a.mastered===a.total&&a.pending===0){
+  if(a.total===50&&a.tried===50&&a.mastered===50&&a.pending===0){
    e.cleared[p]=true;reward+=375;
   }
  }
@@ -73,6 +73,7 @@ function examResult(db,s,questions){
 function gate(db,questions,p){
  var e=ensure(db,questions),price=packPrice(p);
  if(packIds(questions).indexOf(p)===-1)return {ok:false,text:"パックが見つかりません",price:0,prereq:false};
+ if(progress(db,questions,p).total!==50)return {ok:false,text:"追加問題を準備中（50問そろうと解放できます）",price:price,prereq:false};
  if(own(e,p))return {ok:true,owned:true,text:"交換済み",price:price};
  var previous=p===1?progress(db,questions,0):progress(db,questions,p-1);
  var prereq=p===1?(previous.mastered>=45&&previous.pending<=5):(own(e,p-1)&&previous.total>0&&previous.tried===previous.total&&previous.mastered===previous.total&&previous.pending===0);
