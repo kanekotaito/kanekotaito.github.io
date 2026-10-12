@@ -38,6 +38,7 @@ function ensure(db,day){
  m.visitDates[k]=true;
  return m;
 }
+function setGoal(db,n){var m=ensure(db);n=Number(n);if(![3,5,10].includes(n)||m.answered>0)return false;m.goal=n;return true;}
 function target(q,m){return q.target||m.goal;}
 function values(m){return {answered:m.answered,correct:m.correct,learned:m.learned,fixed:m.fixed};}
 function questStats(db){
@@ -76,8 +77,8 @@ function home(db){
  '<div class="mot-track"><div class="mot-track-progress" style="width:'+progress+'%"></div></div><div class="mot-start-actions">'+
  '<button class="mot-main-btn" type="button" data-act="start" data-mode="sprint">▶ 3問クエスト開始 <span>（短時間）</span></button>'+
  '<button class="mot-review-btn" type="button" data-act="start" data-mode="focus">🎯 おまかせ5問特訓</button></div>'+
- '<div class="mot-goal-chooser"><span>今日の目標</span>'+
- [3,5,10].map(function(n){return '<button type="button" data-act="mot-goal" data-goal="'+n+'" aria-pressed="'+(m.goal===n)+'" class="'+(m.goal===n?'active':'')+'">'+n+'問</button>';}).join('')+'</div></section>';
+ '<div class="mot-goal-chooser"><span>'+(m.answered?'今日の目標（回答開始後は固定）':'今日の目標')+'</span>'+
+ [3,5,10].map(function(n){return '<button type="button" data-act="mot-goal" data-goal="'+n+'" aria-pressed="'+(m.goal===n)+'" '+(m.answered?'disabled':'')+' class="'+(m.goal===n?'active':'')+'">'+n+'問</button>';}).join('')+'</div></section>';
  html+='<section class="mot-quests"><div class="mot-section-head"><h3>🎖️ 今日のミッション</h3><span>5つの小さな達成</span></div><div class="mot-quests-grid">';
  questStats(db).forEach(function(q){
   html+='<div class="mot-quest '+(q.done?'mot-complete':'')+'"><div class="mot-quest-icon">'+q.icon+'</div><div class="mot-quest-copy"><strong>'+escapeHtml(q.name)+'</strong><span>'+escapeHtml(q.detail)+'</span><div class="mot-quest-meter"><span style="width:'+q.percent+'%"></span></div></div><div class="mot-quest-end">'+(q.done?'✓ GET':q.value+'/'+q.target)+'<small>+'+q.xp+' XP</small></div></div>';
@@ -93,7 +94,7 @@ function quiz(db,s){
  if(!s||s.mode==="exam")return "";
  var m=ensure(db),pct=Math.round(100*Math.min(m.answered,m.goal)/m.goal);
  var current=Number(s.index)+1,total=s.order.length;
- return '<div class="mot-quiz-strip"><span>💪 今日 '+m.answered+'/'+m.goal+' 問</span><strong>'+(s.mode==="sprint"?'⚡ 3問クエスト':s.mode==="focus"?'🎯 5問特訓':'🎖️ マッチョ特訓')+'</strong><span>あと '+Math.max(0,total-current)+' 問</span><div class="mot-quiz-line"><span style="width:'+pct+'%"></span></div></div>';
+ return '<div class="mot-quiz-strip"><span>💪 今日 '+Math.min(m.answered,m.goal)+'/'+m.goal+' 問</span><strong>'+(s.mode==="sprint"?'⚡ 3問クエスト':s.mode==="focus"?'🎯 5問特訓':'🎖️ マッチョ特訓')+'</strong><span>あと '+Math.max(0,total-current)+' 問</span><div class="mot-quiz-line"><span style="width:'+pct+'%"></span></div></div>';
 }
 function feedback(out){
  if(!out)return "";
@@ -122,5 +123,5 @@ function spark(out){
  if(node._motClear)clearTimeout(node._motClear);
  node._motClear=setTimeout(function(){if(node)node.replaceChildren();},1600);
 }
-window.Motivation={ensure:ensure,record:record,questStats:questStats,medals:medals,home:home,quiz:quiz,feedback:feedback,result:result,spark:spark,dayKey:dayKey};
+window.Motivation={ensure:ensure,setGoal:setGoal,record:record,questStats:questStats,medals:medals,home:home,quiz:quiz,feedback:feedback,result:result,spark:spark,dayKey:dayKey};
 })();
