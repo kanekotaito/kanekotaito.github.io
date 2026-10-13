@@ -26,7 +26,7 @@ netkeibaの出馬表ページを保存でき、規約に沿って手元で使用
 
 規約や許諾条件に照らして、取得が認められることを確認済みの場合のみ実行します。
 
-    python keiba-lab/tools/netkeiba_import.py --race-id <12桁のレースID> --race-date <正しい開催日> --allow-network --horse-count 2 --out my-race.json
+    python keiba-lab/tools/netkeiba_import.py --race-id 202505010701 --race-date 2025-02-15 --allow-network --horse-count 2 --out my-race.json
 
 --allow-network の明示的な指定が必須です。自動巡回なし。robots.txt確認。アクセス間隔は7秒以上、リダイレクト禁止、通信失敗や403/429等で即停止、再試行なし。馬の個別戦績ページを何頭分取得するかは --horse-count 0〜18 で指定します（初期値0）。結果を別に取得する場合は --with-results を付けます。ログイン、有料記事、映像、調教映像、コメント、アクセス制限の回避は実装しません。
 
