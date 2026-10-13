@@ -221,8 +221,20 @@ def parse_horse_history(content: str, cutoff_date: str) -> tuple[list[dict], str
             "speedIndex":number(val(i_index))
         })
     rows.sort(key=lambda x:x["date"],reverse=True)
-    # Better to leave absent bloodline blank than misidentify an ancestor.
-    return rows[:20], None, None
+    # netkeiba pedigree table: 1st ancestor cell = sire, 5th = dam's sire.
+    # Do not infer relatives from plain page text if the structure differs.
+    sire=None
+    damsire=None
+    blood=soup.select_one("table.blood_table")
+    if blood:
+        cells=blood.select("td")
+        if len(cells)>=5:
+            first=cells[0].select_one('a[href*="/horse/"]')
+            maternal=cells[4].select_one('a[href*="/horse/"]')
+            if first and maternal:
+                sire=clean(first) or None
+                damsire=clean(maternal) or None
+    return rows[:20],sire,damsire
 
 
 class PoliteClient:
@@ -266,7 +278,8 @@ class PoliteClient:
         if len(res.content)>3_000_000:raise ImportFailure("HTMLが3MBを超えています")
         if "text/html" not in res.headers.get("Content-Type","text/html"):
             raise ImportFailure("HTML以外の応答を受信しました")
-        res.encoding=res.apparent_encoding if res.apparent_encoding else "EUC-JP"
+        guess=(res.apparent_encoding or "").lower().replace("_","-")
+        res.encoding = guess if guess in ("euc-jp","shift-jis","utf-8","cp932") else "EUC-JP"
         return res.text
 
 
