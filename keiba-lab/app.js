@@ -111,6 +111,19 @@ function calculate(race,weights,simCount=1400){
  rows.sort((a,b)=>b.win-a.win);
  return {rows,active:active.length,missing:race.horses.reduce((n,h)=>n+KEYS.filter(k=>k!=='market'&&h.factors?.[k]===undefined&&all[k]>0).length,0)};
 }
+function actualCoverage(r,weights){
+ if(r.type==='demo')return {ready:true,missing:0};
+ const keys=KEYS.filter(k=>Number(weights[k])>0);
+ if(!keys.length)return {ready:false,missing:r.horses.length};
+ let missing=0;
+ for(const h of r.horses){
+  const have=keys.filter(k=>k==='market'
+   ?(Number.isFinite(h.odds)&&h.odds>1)
+   :(Number.isFinite(h.factors?.[k])&&h.factors[k]>=0&&h.factors[k]<=100));
+  if(have.length<Math.min(2,keys.length))missing++;
+ }
+ return {ready:missing===0,missing};
+}
 function byId(r,id){return r.horses.find(h=>h.id===id)}
 function intro(title,desc,mark='RESEARCH TERMINAL'){return '<section class="intro"><div><div class="eyebrow">'+escapeHtml(mark)+'</div><h1>'+escapeHtml(title)+'</h1><p>'+escapeHtml(desc)+'</p></div><span class="pill">● LOCAL ANALYSIS</span></section>'}
 function card(title,body,extra=''){return '<section class="card"><div class="cardhead"><h3>'+title+'</h3>'+extra+'</div>'+body+'</section>'}
@@ -119,7 +132,15 @@ function hero(race){
  return '<section class="hero"><div class="hero-row"><div><span class="badge '+(race.type==='demo'?'':'blue')+'">'+(race.type==='demo'?'SYNTHETIC DATA · 架空':'IMPORTED DATA · 取込')+'</span><h2>'+escapeHtml(race.name)+'</h2><p>'+escapeHtml(race.date+'  /  '+race.course+'  /  '+race.surface+' '+race.distance+'m')+'</p></div><span class="pill">'+escapeHtml(race.going)+' 馬場</span></div><div class="herostats"><div class="stat"><label>ENTRIES</label><strong>'+race.horses.length+' 頭</strong></div><div class="stat"><label>PACE</label><strong>'+escapeHtml(race.pace||'未設定')+'</strong></div><div class="stat"><label>TRACK</label><strong>'+escapeHtml(race.going||'未設定')+'</strong></div><div class="stat"><label>DATA SNAPSHOT</label><strong>'+escapeHtml((race.asOf||'未入力').slice(0,16).replace('T',' '))+'</strong></div></div></section>'
 }
 function renderLab(){
- const r=currentRace(), pred=calculate(r,state.weights), selected=pred.rows.find(x=>x.id===state.selectedId)||pred.rows[0];
+ const r=currentRace(), coverage=actualCoverage(r,state.weights);
+ if(!coverage.ready){
+  const rows=r.horses.slice().sort((a,b)=>a.number-b.number).map(h=>'<tr><td>'+escapeHtml(h.number)+'</td><td><strong>'+escapeHtml(h.name)+'</strong></td><td>'+escapeHtml(h.sex||'—')+escapeHtml(h.age??'—')+'</td><td>'+escapeHtml(h.jockey||'未取得')+'</td><td>'+escapeHtml(h.trainer||'未取得')+'</td><td>'+escapeHtml(h.odds??'—')+'</td><td>'+escapeHtml(h.pastRuns?.length||0)+'</td></tr>').join('');
+  const source=r.sourceUrl&&/^https:\/\/(?:race|db)\.netkeiba\.com\//.test(r.sourceUrl)?'<p class="hint">出典: <a href="'+escapeHtml(r.sourceUrl)+'" target="_blank" rel="noopener noreferrer">netkeiba出馬表</a> / 取得: '+escapeHtml(r.asOf||'不明')+'</p>':'';
+  const message='<div class="notice"><strong>実データの予測は保留中です。</strong><p>'+r.horses.length+'頭のうち'+coverage.missing+'頭で予測に必要な実測指標が不足しています。欠損を架空の評価値で埋めて、正しい勝率のように表示することはしません。</p></div>';
+  const table='<div class="tablewrap"><table class="smalltable"><thead><tr><th>馬番</th><th>馬名</th><th>性齢</th><th>騎手</th><th>厩舎</th><th>単勝</th><th>過去走</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+source;
+  return intro('実データを、正しく扱う。','取得できた事実だけを表示します。勝率の根拠が不足している間は数値予測を保留します。','REAL RACE DATA / NO GUESSED SCORES')+hero(r)+message+'<div class="spaced">'+card('実際の出走情報',table)+'</div><div class="spaced">'+card('次に必要なこと','<p class="paneltext">過去走や許諾済みの適性データをJSONに追加すると、分析を進められます。<a href="https://github.com/kanekotaito/kanekotaito.github.io/blob/main/keiba-lab/tools/NETKEIBA.md" target="_blank" rel="noopener noreferrer">netkeiba取込ツールの使い方 ↗</a></p><button class="button alt" data-goto="data">データ管理へ</button>')+'</div>';
+ }
+ const pred=calculate(r,state.weights), selected=pred.rows.find(x=>x.id===state.selectedId)||pred.rows[0];
  state.selectedId=selected?.id||null;
  const racePicker='<div class="controls"><label class="field full">対象レース<select id="raceSelect">'+state.races.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(x=>'<option value="'+escapeHtml(x.id)+'" '+(r.id===x.id?'selected':'')+'>'+escapeHtml(raceLabel(x))+'</option>').join('')+'</select></label><label class="field">競馬場 / 距離<input readonly value="'+escapeHtml(r.course+' / '+r.surface+' '+r.distance+'m')+'"></label><label class="field">馬場 / 想定ペース<input readonly value="'+escapeHtml(r.going+' / '+(r.pace||'不明'))+'"></label></div><p class="hint">入力は発走前に確定した情報だけを使用してください。取込データの正確性は提供元に依存します。</p>';
  const ranking='<div class="table-top"><span>馬番</span><span>出走馬 / 騎手</span><span>勝率の大きさ</span><span>試算勝率</span><span>単勝</span></div>'+pred.rows.map((h,i)=>'<button class="horserow '+(h.id===selected.id?'selected':'')+'" data-horse="'+escapeHtml(h.id)+'" aria-label="'+escapeHtml(h.name)+' の詳細を表示"><span class="num w'+h.draw+'">'+h.number+'</span><span><span class="hn">'+escapeHtml(h.name)+'</span><small>'+escapeHtml(h.jockey)+' · '+h.age+'歳 · '+escapeHtml(h.style||'未登録')+'</small></span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,100*h.win/.5)+'%"></div></div><span class="metric">'+pct(h.win)+'</span><span class="odds">'+(h.odds?fmt(h.odds):'—')+'</span></button>').join('')+'<p class="hint">推定勝率は重み付き指数から作った未校正モデルの値です。実際の勝率を保証しません。緑バーは50%を最大幅として表示。</p>';
@@ -186,7 +207,7 @@ function recordDetail(rec){
 }
 function benchmark(){
  const scope=state.benchScope;
- const available=state.races.filter(r=>Array.isArray(r.result)&&r.result.length>0);
+ const available=state.races.filter(r=>Array.isArray(r.result)&&r.result.length>0&&actualCoverage(r,state.weights).ready);
  const subset=available.filter(r=>scope==='all'||(scope==='demo'?r.type==='demo':r.type!=='demo')).filter(r=>{
   switch(state.benchGroup){
    case 'turf':return r.surface==='芝';
