@@ -99,7 +99,14 @@ function factorValue(h,k,r){
  return clamp(50+15*Math.log(implied*r.horses.length),5,95);
 }
 function calculate(race,weights,simCount=1400){
- const all=normalizeWeights(weights), active=KEYS.filter(k=>all[k]>0), wsum=sum(active.map(k=>all[k]))||1;
+ const all=normalizeWeights(weights);
+ if(race.type!=='demo'){
+  const shared=KEYS.filter(k=>race.horses.every(h=>k==='market'
+   ?(Number.isFinite(h.odds)&&h.odds>1)
+   :(Number.isFinite(h.factors?.[k])&&h.factors[k]>=0&&h.factors[k]<=100)));
+  KEYS.forEach(k=>{if(!shared.includes(k))all[k]=0});
+ }
+ const active=KEYS.filter(k=>all[k]>0), wsum=sum(active.map(k=>all[k]))||1;
  const logits=race.horses.map(h=>sum(active.map(k=>((factorValue(h,k,race)-50)*all[k])/wsum))/8);
  const max=Math.max(...logits), raw=logits.map(v=>Math.exp(v-max)), norm=sum(raw), probs=raw.map(v=>v/norm);
  const rng=prng(hash(race.id+'|'+active.map(k=>k+all[k]).join(':'))), win=new Array(probs.length).fill(0), top3=new Array(probs.length).fill(0), rankSum=new Array(probs.length).fill(0);
@@ -112,17 +119,12 @@ function calculate(race,weights,simCount=1400){
  return {rows,active:active.length,missing:race.horses.reduce((n,h)=>n+KEYS.filter(k=>k!=='market'&&h.factors?.[k]===undefined&&all[k]>0).length,0)};
 }
 function actualCoverage(r,weights){
- if(r.type==='demo')return {ready:true,missing:0};
+ if(r.type==='demo')return {ready:true,missing:0,shared:KEYS.length};
  const keys=KEYS.filter(k=>Number(weights[k])>0);
- if(!keys.length)return {ready:false,missing:r.horses.length};
- let missing=0;
- for(const h of r.horses){
-  const have=keys.filter(k=>k==='market'
+ const shared=keys.filter(k=>r.horses.every(h=>k==='market'
    ?(Number.isFinite(h.odds)&&h.odds>1)
-   :(Number.isFinite(h.factors?.[k])&&h.factors[k]>=0&&h.factors[k]<=100));
-  if(have.length<Math.min(2,keys.length))missing++;
- }
- return {ready:missing===0,missing};
+   :(Number.isFinite(h.factors?.[k])&&h.factors[k]>=0&&h.factors[k]<=100)));
+ return {ready:shared.length>=2,missing:Math.max(0,2-shared.length),shared:shared.length};
 }
 function byId(r,id){return r.horses.find(h=>h.id===id)}
 function intro(title,desc,mark='RESEARCH TERMINAL'){return '<section class="intro"><div><div class="eyebrow">'+escapeHtml(mark)+'</div><h1>'+escapeHtml(title)+'</h1><p>'+escapeHtml(desc)+'</p></div><span class="pill">● LOCAL ANALYSIS</span></section>'}
@@ -136,13 +138,14 @@ function renderLab(){
  if(!coverage.ready){
   const rows=r.horses.slice().sort((a,b)=>a.number-b.number).map(h=>'<tr><td>'+escapeHtml(h.number)+'</td><td><strong>'+escapeHtml(h.name)+'</strong></td><td>'+escapeHtml(h.sex||'—')+escapeHtml(h.age??'—')+'</td><td>'+escapeHtml(h.jockey||'未取得')+'</td><td>'+escapeHtml(h.trainer||'未取得')+'</td><td>'+escapeHtml(h.odds??'—')+'</td><td>'+escapeHtml(h.pastRuns?.length||0)+'</td></tr>').join('');
   const source=r.sourceUrl&&/^https:\/\/(?:race|db)\.netkeiba\.com\//.test(r.sourceUrl)?'<p class="hint">出典: <a href="'+escapeHtml(r.sourceUrl)+'" target="_blank" rel="noopener noreferrer">netkeiba出馬表</a> / 取得: '+escapeHtml(r.asOf||'不明')+'</p>':'';
-  const message='<div class="notice"><strong>実データの予測は保留中です。</strong><p>'+r.horses.length+'頭のうち'+coverage.missing+'頭で予測に必要な実測指標が不足しています。欠損を架空の評価値で埋めて、正しい勝率のように表示することはしません。</p></div>';
+  const message='<div class="notice"><strong>実データの予測は保留中です。</strong><p>全'+r.horses.length+'頭に共通して取得できた分析項目は '+coverage.shared+'種類です。最低2種類必要です。馬ごとに異なる欠損を架空の評価値で埋め、正しい勝率のように表示することはしません。</p></div>';
   const table='<div class="tablewrap"><table class="smalltable"><thead><tr><th>馬番</th><th>馬名</th><th>性齢</th><th>騎手</th><th>厩舎</th><th>単勝</th><th>過去走</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+source;
   return intro('実データを、正しく扱う。','取得できた事実だけを表示します。勝率の根拠が不足している間は数値予測を保留します。','REAL RACE DATA / NO GUESSED SCORES')+hero(r)+message+'<div class="spaced">'+card('実際の出走情報',table)+'</div><div class="spaced">'+card('次に必要なこと','<p class="paneltext">過去走や許諾済みの適性データをJSONに追加すると、分析を進められます。<a href="https://github.com/kanekotaito/kanekotaito.github.io/blob/main/keiba-lab/tools/NETKEIBA.md" target="_blank" rel="noopener noreferrer">netkeiba取込ツールの使い方 ↗</a></p><button class="button alt" data-goto="data">データ管理へ</button>')+'</div>';
  }
  const pred=calculate(r,state.weights), selected=pred.rows.find(x=>x.id===state.selectedId)||pred.rows[0];
  state.selectedId=selected?.id||null;
  const racePicker='<div class="controls"><label class="field full">対象レース<select id="raceSelect">'+state.races.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(x=>'<option value="'+escapeHtml(x.id)+'" '+(r.id===x.id?'selected':'')+'>'+escapeHtml(raceLabel(x))+'</option>').join('')+'</select></label><label class="field">競馬場 / 距離<input readonly value="'+escapeHtml(r.course+' / '+r.surface+' '+r.distance+'m')+'"></label><label class="field">馬場 / 想定ペース<input readonly value="'+escapeHtml(r.going+' / '+(r.pace||'不明'))+'"></label></div><p class="hint">入力は発走前に確定した情報だけを使用してください。取込データの正確性は提供元に依存します。</p>';
+ const coverageMessage=r.type!=='demo'?'<div class="notice goodnotice">全馬共通で確認できた '+coverage.shared+'種類の項目だけを用いて比較しています。確率は未校正の試算で、実際の勝率ではありません。</div>':'';
  const ranking='<div class="table-top"><span>馬番</span><span>出走馬 / 騎手</span><span>勝率の大きさ</span><span>試算勝率</span><span>単勝</span></div>'+pred.rows.map((h,i)=>'<button class="horserow '+(h.id===selected.id?'selected':'')+'" data-horse="'+escapeHtml(h.id)+'" aria-label="'+escapeHtml(h.name)+' の詳細を表示"><span class="num w'+h.draw+'">'+h.number+'</span><span><span class="hn">'+escapeHtml(h.name)+'</span><small>'+escapeHtml(h.jockey)+' · '+h.age+'歳 · '+escapeHtml(h.style||'未登録')+'</small></span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,100*h.win/.5)+'%"></div></div><span class="metric">'+pct(h.win)+'</span><span class="odds">'+(h.odds?fmt(h.odds):'—')+'</span></button>').join('')+'<p class="hint">推定勝率は重み付き指数から作った未校正モデルの値です。実際の勝率を保証しません。緑バーは50%を最大幅として表示。</p>';
  const presets='<div class="modetabs">'+Object.entries(PRESETS).map(([k,v])=>'<button data-preset="'+k+'" class="'+(state.preset===k?'active':'')+'">'+v.label+'</button>').join('')+'</div><p class="hint">'+escapeHtml(PRESETS[state.preset].desc)+'</p>';
  const weights='<div class="weightlist">'+FACTORS.map(([key,label,title])=>'<label title="'+escapeHtml(title)+'" class="weightrow"><span>'+escapeHtml(label)+'</span><input type="range" min="0" max="100" step="1" data-weight="'+key+'" value="'+state.weights[key]+'" aria-label="'+escapeHtml(label)+'"><strong data-weight-label="'+key+'">'+state.weights[key]+'</strong></label>').join('')+'</div><p class="weighthelp">0は評価から除外。各重みは合計値で正規化して計算します。指標は独立とは限らないため重複評価に注意。</p><label class="field full mt12">予想の理由や迷った点<textarea id="forecastNote" placeholder="例：前半が速くなると予想。外差し馬場を重視した。" rows="2"></textarea></label><div class="btnrow"><button class="button alt" data-action="resetWeights">基準に戻す</button><button class="button ghost" data-action="saveForecast">この予想を記録</button></div>';
@@ -151,7 +154,7 @@ function renderLab(){
  const detail='<div class="detailtop"><span class="num w'+selected.draw+'">'+selected.number+'</span><div><h3>'+escapeHtml(selected.name)+'</h3><p>'+escapeHtml(selected.sex||'?')+selected.age+'歳 / '+escapeHtml(selected.jockey)+'騎手</p></div></div>'+kpis+factors+'<div class="line"></div><table class="info-table"><tr><td>父 / 母父</td><td>'+escapeHtml(selected.sire||'未登録')+' / '+escapeHtml(selected.damSire||'未登録')+'</td></tr><tr><td>厩舎</td><td>'+escapeHtml(selected.trainer||'未登録')+'</td></tr><tr><td>斤量 / 枠</td><td>'+selected.weight+'kg / '+selected.draw+'枠</td></tr><tr><td>近走</td><td>'+escapeHtml(selected.form||'未登録')+'</td></tr><tr><td>レース間隔</td><td>'+escapeHtml(selected.lastRunDays??'未登録')+' 日</td></tr><tr><td>期待倍率</td><td>'+((selected.odds&&selected.ev!==null)?fmt(selected.ev,2)+' 倍（勝率×単勝）':'オッズ未登録')+'</td></tr></table><p class="hint">期待倍率は控除率・購入タイミング・オッズ変動・推定誤差を考慮していません。</p>';
  const resultStatus = !r.result?'<div class="notice">このレースには結果が登録されていません。実際の結果を反映するにはJSON/CSVを再取込してください。</div>':hideOutcome(r)?'<div class="notice">過去の結果は非表示です。先に自分の仮説を保存してから答え合わせしましょう。</div><div class="btnrow"><button class="button alt" data-action="reveal">結果を表示する</button></div>':renderRaceOutcome(r,pred);
  const scoreNote=pred.missing?'<div class="notice">未登録の評価項目が'+pred.missing+'件あります。該当項目は中立値50で補完しています。精度の根拠にはなりません。</div>':'';
- return intro('勝ち筋を、研究しよう。','馬の能力だけでなく、展開・適性・市場の見立てを分解する。重みを動かして、自分の予想理論を検証。')+hero(r)+'<div class="cols"><div class="stack">'+card('01 / レースを選ぶ',racePicker,'<small>RACE SELECTOR</small>')+card('02 / 勝率シミュレーション',ranking,'<small>'+r.horses.length+' runners · Monte Carlo</small>')+card('04 / 結果と答え合わせ',resultStatus)+'</div><div class="stack">'+card('予想モデル',presets+'<div class="line"></div>'+weights,'<small>MODEL WEIGHTS</small>')+card('03 / 注目馬を深掘り',detail,'<small>HORSE DETAIL</small>')+scoreNote+'</div></div>';
+ return intro('勝ち筋を、研究しよう。','馬の能力だけでなく、展開・適性・市場の見立てを分解する。重みを動かして、自分の予想理論を検証。')+hero(r)+coverageMessage+'<div class="cols"><div class="stack">'+card('01 / レースを選ぶ',racePicker,'<small>RACE SELECTOR</small>')+card('02 / 勝率シミュレーション',ranking,'<small>'+r.horses.length+' runners · Monte Carlo</small>')+card('04 / 結果と答え合わせ',resultStatus)+'</div><div class="stack">'+card('予想モデル',presets+'<div class="line"></div>'+weights,'<small>MODEL WEIGHTS</small>')+card('03 / 注目馬を深掘り',detail,'<small>HORSE DETAIL</small>')+scoreNote+'</div></div>';
 }
 function renderRaceOutcome(r,pred){
  const map=new Map(pred.rows.map(h=>[h.id,h]));
@@ -338,7 +341,7 @@ async function importFile(file){
   const list=Array.isArray(obj)?obj:Array.isArray(obj.races)?obj.races:[obj];
   if(!list.length||list.length>300)throw Error('1回の取込は1〜300レースまでです');
   if(!list.every(validateRace))throw Error('レースの形式が正しくありません。DATA_FORMAT.mdを確認してください。');
-  list.forEach(r=>upsert(window.KEIBA_FEATURES.enrichRace(cleanRace(r))));store();go('data');toast(list.length+'レースを取り込みました');
+  list.forEach(r=>upsert(window.KEIBA_FEATURES.enrichRace(cleanRace(r))));state.raceId=list[0].id.startsWith('demo-')?'import-'+list[0].id:list[0].id;state.selectedId=null;store();go('lab');toast(list.length+'レースを取り込みました');
  }catch(e){toast('取込できません: '+String(e.message||e).slice(0,130))}
 }
 function upsert(r){if(r.id.startsWith('demo-'))r.id='import-'+r.id;const i=state.races.findIndex(x=>x.id===r.id);if(i>=0){if(state.races[i].type==='demo')throw Error('デモレースは上書きできません');state.races[i]=r}else state.races.push(r)}
