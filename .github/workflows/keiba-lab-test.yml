@@ -22,3 +22,12 @@ jobs:
           node --check keiba-lab/feature-engine.js
       - name: Run smoke tests
         run: node keiba-lab/tests/smoke.test.cjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install parser dependencies
+        run: python -m pip install -r keiba-lab/tools/requirements.txt
+      - name: Verify Python parser syntax
+        run: python -m py_compile keiba-lab/tools/netkeiba_import.py
+      - name: Run offline HTML parser tests
+        run: python -m unittest discover -s keiba-lab/tests -p test_netkeiba.py -v
